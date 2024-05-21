@@ -7,7 +7,7 @@ export default function App() {
     <View className="flex-1 items-center justify-center bg-white">
       <Text className ="text-3xl">The Masjid App</Text>
       <StatusBar style="auto" />
-      <Link href ="/profile" style= {{color:'blue'}}>Got to Profile</Link>
+      <Link href ="/Profile" style= {{color:'blue'}}>Got to Profile</Link>
     </View>
   );
 }
