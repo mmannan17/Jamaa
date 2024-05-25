@@ -8,7 +8,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/mosque.jpg",
+      "image": "./assets/images/mosque.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,7 +22,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/mosque.jpg"
+      "favicon": "./assets/images/mosque.jpg"
     },
     "plugins": [
       "expo-router"
