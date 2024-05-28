@@ -7,6 +7,13 @@ from .models import CustomUser, Mosque, Post, Follow
 from .serializers import CustomUserSerializer, MosqueSerializer, PostSerializer, FollowSerializer
 from django.contrib.auth.models import Permission
 
+
+
+from django.http import HttpResponse
+
+def index(request):
+    return HttpResponse("Welcome to the Mosque App")
+
 class RegisterUserView(APIView):
     def post(self, request):
         serializer = CustomUserSerializer(data=request.data)
@@ -20,7 +27,7 @@ class RegisterUserView(APIView):
                     Permission.objects.get(codename='can_post_media'),
                 ]
                 user.user_permissions.set(permissions)
-                Mosque.objects.create(user=user, email=user.email, mosquename=user.username)
+                Mosque.objects.create(user=user, email=user.email, mosquename=user.username, address=user.address)
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),

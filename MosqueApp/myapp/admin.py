@@ -1,18 +1,12 @@
-
 from django.contrib import admin
-from .models import Mosque, User, Post, Follow
-
-
-
-from django.contrib import admin
-from .models import Mosque, User, Post, Follow
+from .models import Mosque, CustomUser, Post, Follow
 
 class MosqueAdmin(admin.ModelAdmin):
     list_display = ('mosque_id', 'mosquename', 'email', 'address')
     search_fields = ('mosquename', 'address')
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'username', 'email')
+    list_display = ('id', 'username', 'email')
     search_fields = ('username', 'email')
 
 class PostAdmin(admin.ModelAdmin):
@@ -23,9 +17,7 @@ class FollowAdmin(admin.ModelAdmin):
     list_display = ('follow_id', 'user', 'mosque')
     search_fields = ('user__username', 'mosque__mosquename')
 
-
-
-admin.site.register(Mosque)
-admin.site.register(User)
-admin.site.register(Post)
-admin.site.register(Follow)
+admin.site.register(Mosque, MosqueAdmin)
+admin.site.register(CustomUser, UserAdmin)
+admin.site.register(Post, PostAdmin)
+admin.site.register(Follow, FollowAdmin)

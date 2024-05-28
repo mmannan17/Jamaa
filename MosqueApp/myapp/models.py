@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
-from django.conf import settings
 
 class CustomUser(AbstractUser):
     USER_ROLE_CHOICES = (
@@ -9,6 +8,7 @@ class CustomUser(AbstractUser):
         ('guest', 'Guest')
     )
     role = models.CharField(max_length=10, choices=USER_ROLE_CHOICES)
+    address = models.CharField(max_length=255, blank=True, null=True)  # Add this line
     groups = models.ManyToManyField(
         Group,
         related_name='customuser_set',
@@ -25,7 +25,7 @@ class CustomUser(AbstractUser):
     )
 
 class Mosque(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     mosque_id = models.AutoField(primary_key=True)
     mosquename = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
