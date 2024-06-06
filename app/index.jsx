@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, Text, View, Image } from 'react-native';
-import {Redirect, router} from 'expo-router';
+import {Link, Redirect, router} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import { images } from '../constants';
 import CustomButton from '../components/CustomButton';
@@ -33,6 +33,9 @@ export default function App() {
           title = "Sign Up/Sign In"
           handlePress ={() => router.push('/sign-in')} 
           containerStyles="w-full mt-7"/>
+
+          <Link href='/home' className="text-white pt-5">Skip Sign-In</Link>
+
         </View>
       </ScrollView>
       <StatusBar backgroundColor='#161622' style='light'/>
