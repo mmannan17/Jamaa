@@ -8,7 +8,10 @@ class CustomUser(AbstractUser):
         ('guest', 'Guest')
     )
     role = models.CharField(max_length=10, choices=USER_ROLE_CHOICES)
-    address = models.CharField(max_length=255, blank=True, null=True)  # Add this line
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    grid_cell_lat = models.IntegerField(default=0)
+    grid_cell_lon = models.IntegerField(default=0)
     groups = models.ManyToManyField(
         Group,
         related_name='customuser_set',
@@ -34,6 +37,9 @@ class Mosque(models.Model):
     profile_pic = models.CharField(max_length=255, blank=True)
     prayer_times = models.CharField(max_length=255)
     address = models.CharField(max_length=255, unique=True)
+    lat = models.FloatField(default=0.0)
+    lon = models.FloatField(default=0.0)
+    nonprofitform= models.FileField(upload_to='mosque_verification/',blank=False, null=False,default='placeholder.pdf')
 
     class Meta:
         permissions = [

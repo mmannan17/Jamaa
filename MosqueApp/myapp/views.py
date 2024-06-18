@@ -6,10 +6,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser, Mosque, Post, Follow
 from .serializers import CustomUserSerializer, MosqueSerializer, PostSerializer, FollowSerializer
 from django.contrib.auth.models import Permission
-
-
-
+from .updatelocation import get_location
+from .utils import get_grid
+from django.core.cache import cache
+import logging
 from django.http import HttpResponse
+
+logger = logging.getLogger(__name__)
 
 def index(request):
     return HttpResponse("Welcome to the Mosque App")
@@ -18,8 +21,28 @@ class RegisterUserView(APIView):
     def post(self, request):
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            if user.role == 'mosque':
+            validated_data = serializer.validated_data
+            role = validated_data['role']
+            
+            if role == 'mosque':
+                address = request.data.get('address')
+                lat, lon = get_location(address)
+                
+                if lat is None or lon is None:
+                    return Response({'error': 'Invalid address'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                grid_lat, grid_lon = get_grid(lat, lon)
+                
+                user = CustomUser.objects.create(
+                    username=validated_data['username'],
+                    email=validated_data['email'],
+                    role=role,
+                    latitude=lat,
+                    longitude=lon,
+                )
+                user.set_password(validated_data['password'])
+                user.save()
+                
                 permissions = [
                     Permission.objects.get(codename='can_change_prayer_times'),
                     Permission.objects.get(codename='can_post_announcements'),
@@ -27,13 +50,45 @@ class RegisterUserView(APIView):
                     Permission.objects.get(codename='can_post_media'),
                 ]
                 user.user_permissions.set(permissions)
-                Mosque.objects.create(user=user, email=user.email, mosquename=user.username, address=user.address)
+                
+                mosque=Mosque.objects.create(
+                    user=user,
+                    email=user.email,
+                    mosquename=user.username,
+                    address=address,
+                    lat=lat,
+                    lon=lon,
+                    grid_cell_lat=grid_lat,
+                    grid_cell_lon=grid_lon,
+                )
+                
+                cache_key = f'grid_{grid_lat}_{grid_lon}'
+                cache_mosques = cache.get(cache_key, [])
+                cache_mosques.append(mosque)
+                cache.set(cache_key, cache_mosques)
+
+            elif role == 'user':
+                latitude = request.data.get('latitude')
+                longitude = request.data.get('longitude')
+
+                user = CustomUser.objects.create(
+                    username=validated_data['username'],
+                    email=validated_data['email'],
+                    role=role,
+                    latitude=latitude,
+                    longitude=longitude,
+                )
+                user.set_password(validated_data['password'])
+                user.save()
+
             refresh = RefreshToken.for_user(user)
+
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
                 'user': serializer.data
             }, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateMosqueView(APIView):
@@ -139,3 +194,31 @@ class LikePostView(APIView):
         
         post.likes.remove(request.user)
         return Response({'status': 'Post unliked'}, status=status.HTTP_200_OK)
+
+
+class NearbyMosquesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        lat = float(request.query_params.get('lat'))
+        lon = float(request.query_params.get('lon'))
+        distance = int(request.query_params.get('distance', 1))  # Default distance is 1 grid cell
+
+        grid_lat, grid_lon = get_grid(lat, lon)
+        mosques = []
+
+        for dlat in range(-distance, distance + 1):
+            for dlon in range(-distance, distance + 1):
+                cache_key = f'grid_{grid_lat + dlat}_{grid_lon + dlon}'
+                cached_mosques = cache.get(cache_key, [])
+                mosques.extend(cached_mosques)
+
+        serializer = MosqueSerializer(mosques, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MosqueVerificationView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    
+
