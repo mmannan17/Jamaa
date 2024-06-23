@@ -1,26 +1,54 @@
 import { View, Text, FlatList, Image, RefreshControl } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from '../../constants'
 import SearchInput from '../../components/SearchInput'
 import Trending from '../../components/Trending'
 import EmptyState from '../../components/EmptyState'
+import { getAllPosts, getLatestPosts } from '../../apiRequests'
 
 const Home = () => {
+  const [posts, setPosts] = useState([]);
+  const [latestPosts, setLatestPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false)
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setRefreshing(false);
-  }
+  // const fetchPosts = async () => {
+  //   try {
+  //     const data = await getAllPosts();
+  //     setPosts(data);
+  //   } catch (error) {
+  //     console.error('Error fetching posts:', error);
+  //   }
+  // };
+
+  // const fetchLatestPosts = async () => {
+  //   try {
+  //     const data = await getLatestPosts();
+  //     setLatestPosts(data);
+  //   } catch (error) {
+  //     console.error('Error fetching latest posts:', error);
+  //   }
+  // };
+
+  // const onRefresh = async () => {
+  //   setRefreshing(true);
+  //   await fetchPosts();
+  //   await fetchLatestPosts();
+  //   setRefreshing(false);
+  // }
+
+  // useEffect(() => {
+  //   fetchPosts();
+  //   fetchLatestPosts();
+  // }, []);
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList 
-      data = {[{id : 1}, {id : 2}, {id : 3}]}
-      keyExtractor = {(item =>item.$id)}
+      data = {posts}
+      keyExtractor = {(item) => item.id.toString()}
       renderItem={({item}) => (
-        <Text className="text-3xl text-white">{item.id}</Text>
+        <Text className="text-3xl text-white">{item.post_id}</Text>
       )}
       ListHeaderComponent={()=>(
         <View className="flex mt-6 px-4 space-y-6">
@@ -50,7 +78,7 @@ const Home = () => {
               Latest Videos
             </Text>
 
-            <Trending posts={[{id : 1}, {id : 2}, {id : 3}] ?? []} />
+            <Trending posts={latestPosts} />
 
           </View>
         </View>

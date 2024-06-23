@@ -5,6 +5,7 @@ import {images} from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
 import {Link} from 'expo-router';
+import { loginUser } from '../../apiRequests';
 
 const SignIn = () => {
 const [form, setForm] = useState ({
@@ -14,7 +15,24 @@ const [form, setForm] = useState ({
 
 const [isSubmitting, setisSubmitting] = useState(false)
 
-const submit = () => {}
+const submit = async () => {
+  setIsSubmitting(true);
+  try {
+    const userData = {
+      username: form.email, // Assuming you're using email as the username
+      password: form.password,
+    };
+    const response = await loginUser(userData);
+    console.log('User logged in successfully:', response);
+    // Optionally, save the token and navigate to another screen
+    // e.g., save the token in async storage and navigate to the home screen
+  } catch (error) {
+    console.error('Error logging in:', error);
+    // Optionally, show an error message to the user
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <SafeAreaView className ="bg-primary h-full">
