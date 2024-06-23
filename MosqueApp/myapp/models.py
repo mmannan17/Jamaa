@@ -39,6 +39,8 @@ class Mosque(models.Model):
     address = models.CharField(max_length=255, unique=True)
     lat = models.FloatField(default=0.0)
     lon = models.FloatField(default=0.0)
+    grid_cell_lat = models.IntegerField(default=0)
+    grid_cell_lon = models.IntegerField(default=0)
     nonprofitform= models.FileField(upload_to='mosque_verification/',blank=False, null=False,default='placeholder.pdf')
 
     class Meta:

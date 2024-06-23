@@ -17,13 +17,14 @@ logger = logging.getLogger(__name__)
 def index(request):
     return HttpResponse("Welcome to the Mosque App")
 
+
 class RegisterUserView(APIView):
     def post(self, request):
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
             role = validated_data['role']
-            
+
             if role == 'mosque':
                 address = request.data.get('address')
                 lat, lon = get_location(address)
@@ -32,7 +33,7 @@ class RegisterUserView(APIView):
                     return Response({'error': 'Invalid address'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 grid_lat, grid_lon = get_grid(lat, lon)
-                
+
                 user = CustomUser.objects.create(
                     username=validated_data['username'],
                     email=validated_data['email'],
@@ -51,7 +52,7 @@ class RegisterUserView(APIView):
                 ]
                 user.user_permissions.set(permissions)
                 
-                mosque=Mosque.objects.create(
+                mosque = Mosque.objects.create(
                     user=user,
                     email=user.email,
                     mosquename=user.username,
@@ -65,11 +66,14 @@ class RegisterUserView(APIView):
                 cache_key = f'grid_{grid_lat}_{grid_lon}'
                 cache_mosques = cache.get(cache_key, [])
                 cache_mosques.append(mosque)
-                cache.set(cache_key, cache_mosques)
+                cache.set(cache_key, cache_mosques, timeout=86400)
+                logger.debug(f"Set cache for key: {cache_key} with mosque: {mosque}")
 
             elif role == 'user':
                 latitude = request.data.get('latitude')
                 longitude = request.data.get('longitude')
+
+                grid_lat, grid_lon = get_grid(latitude, longitude)
 
                 user = CustomUser.objects.create(
                     username=validated_data['username'],
@@ -77,6 +81,8 @@ class RegisterUserView(APIView):
                     role=role,
                     latitude=latitude,
                     longitude=longitude,
+                    grid_cell_lat=grid_lat,
+                    grid_cell_lon=grid_lon,
                 )
                 user.set_password(validated_data['password'])
                 user.save()
@@ -90,6 +96,8 @@ class RegisterUserView(APIView):
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class UpdateMosqueView(APIView):
     permission_classes = [IsAuthenticated]
@@ -202,7 +210,7 @@ class NearbyMosquesView(APIView):
     def get(self, request):
         lat = float(request.query_params.get('lat'))
         lon = float(request.query_params.get('lon'))
-        distance = int(request.query_params.get('distance', 1))  # Default distance is 1 grid cell
+        distance = int(request.query_params.get('distance', 1))  
 
         grid_lat, grid_lon = get_grid(lat, lon)
         mosques = []
@@ -211,6 +219,14 @@ class NearbyMosquesView(APIView):
             for dlon in range(-distance, distance + 1):
                 cache_key = f'grid_{grid_lat + dlat}_{grid_lon + dlon}'
                 cached_mosques = cache.get(cache_key, [])
+                if cached_mosques is None:
+                    cached_mosques = list(Mosque.objects.filter(
+                        grid_cell_lat=grid_lat + dlat,
+                        grid_cell_lon=grid_lon + dlon
+                    ))
+                    cache.set(cache_key, cached_mosques, timeout=86400)
+
+                logger.debug(f"Retrieved cache for key: {cache_key} with mosques: {cached_mosques}")
                 mosques.extend(cached_mosques)
 
         serializer = MosqueSerializer(mosques, many=True)
