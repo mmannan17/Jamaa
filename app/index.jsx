@@ -16,13 +16,13 @@ export default function App() {
             resizeMode = "contain"
           />
           <Image 
-          source = {images.cards}
-          className="max-w-[380px] w-full h-[300px]"
+          source={require('../assets/images/orangeMosque.png')}
+          className="max-w-[230px] w-full h-[300px]"
           resizeMode='contain'
           />
           <View className = "relative mt-5">
             <Text className = "text-3xl text-white font-bold text-center"> Welcome to
-            <Text className = "text-secondary-200"> The Masjid App{"\n"}</Text>
+            <Text className = "text-secondary-200"> Masjidy{"\n"}</Text>
             </Text>
           </View>
 

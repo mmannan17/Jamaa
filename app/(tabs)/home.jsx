@@ -30,12 +30,12 @@ const Home = () => {
   //   }
   // };
 
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   await fetchPosts();
-  //   await fetchLatestPosts();
-  //   setRefreshing(false);
-  // }
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    await fetchLatestPosts();
+    setRefreshing(false);
+  }
 
   // useEffect(() => {
   //   fetchPosts();

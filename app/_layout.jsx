@@ -2,6 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import {Slot, SplashScreen, Stack} from 'expo-router';
 import {useFonts} from 'expo-font';
 import {useEffect} from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,7 +34,6 @@ const RootLayout = () => {
         <Stack.Screen name= "(auth)" options = {{headerShown: false}} />
         <Stack.Screen name= "(tabs)" options = {{headerShown: false}} />
         {/* <Stack.Screen name= "/search/[query]" options = {{headerShown: false}} /> */}
-
     </Stack>
   )
 }

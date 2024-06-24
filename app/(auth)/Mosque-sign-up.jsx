@@ -24,7 +24,7 @@ const SignUp = () => {
         username: form.username,
         email: form.email,
         password: form.password,
-        role:"user"
+        role:"mosque"
       };
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);
@@ -42,14 +42,14 @@ const SignUp = () => {
       <ScrollView>
         <View className="w-full justify-center min-h-[75vh] px-4 my-6">
           <Image source={images.logo} resizeMode='contain' className="w-[115px] h-[35px]" />
-          <Text className="text-2xl text-white mt-10 font-psemibold">Sign Up to the Masjid App</Text>
+          <Text className="text-2xl text-white mt-10 font-psemibold">Register Your Masjid</Text>
 
           <FormField
-            title="Username"
+            title="Mosque Name"
             value={form.username}
             handleChangeText={(e) => setForm({ ...form, username: e })}
             otherStyles="mt-10"
-            placeholder="Enter Username"
+            placeholder="Enter Mosque Name"
           />
 
           <FormField
@@ -58,7 +58,7 @@ const SignUp = () => {
             handleChangeText={(e) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
-            placeholder="Enter Email Address"
+            placeholder="Enter Email for Login"
           />
 
           <FormField
@@ -66,8 +66,17 @@ const SignUp = () => {
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
-            secureTextEntry={true} 
+            secureTextEntry={true}
             placeholder="Enter Password"
+          />
+
+        <FormField
+            title="Mosque Address"
+            value={form.email}
+            handleChangeText={(e) => setForm({ ...form, email: e })}
+            otherStyles="mt-7"
+            placeholder= "Enter Address"
+            keyboardType="address"
           />
 
           <CustomButton

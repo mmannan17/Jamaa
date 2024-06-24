@@ -1,12 +1,24 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, TextInput} from 'react-native'
+import React, { useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const Create = () => {
-  return (
-    <View>
-      <Text>Create</Text>
-    </View>
-  )
-}
+  const [value, setValue] = useState(''); // Initialize state for text input
 
-export default Create
+  return (
+    <SafeAreaView className="bg-primary h-full justify-center items-center">
+      <TextInput
+        editable
+        multiline
+        numberOfLines={4}
+        maxLength={40}
+        onChangeText={text => setValue(text)} // Update state on text change
+        value={value} // Bind state to value prop
+        className="p-2 border border-gray-300 rounded bg-white text-black"
+      />
+    </SafeAreaView>
+  );
+};
+
+export default Create;
