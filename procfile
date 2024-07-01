@@ -1,1 +1,1 @@
-web: gunicorn MosqueApp.MosqueApp.wsgi:application
+web: gunicorn MosqueApp.wsgi:application
