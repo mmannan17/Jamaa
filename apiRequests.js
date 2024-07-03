@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/MosqueApp/';
+const API_URL = "http://masjidapp-dev.us-east-1.elasticbeanstalk.com/";
 
 export const getAllPosts = async () => {
   try {
