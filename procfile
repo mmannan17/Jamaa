@@ -1,1 +1,1 @@
-web: gunicorn MosqueApp.MosqueApp.wsgi:application --log-file -
+web: gunicorn MosqueAppchild.wsgi:application --log-file -

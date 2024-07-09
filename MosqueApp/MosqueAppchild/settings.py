@@ -1,16 +1,17 @@
-from pathlib import Path
 import os
+from pathlib import Path
 from dotenv import load_dotenv
-
-load_dotenv()
+from decouple import config
+from urllib.parse import urlparse
+import logging
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
-
-DEBUG = True
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+DEBUG = config('DEBUG', default=True, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -35,7 +36,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'MosqueApp.urls'
+ROOT_URLCONF = 'MosqueAppchild.urls'
 
 TEMPLATES = [
     {
@@ -53,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'MosqueApp.wsgi.application'
+WSGI_APPLICATION = 'MosqueAppchild.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -82,11 +83,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'
@@ -94,7 +92,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'myapp.CustomUser'
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -125,6 +122,11 @@ LOGGING = {
         'handlers': ['console'],
         'level': 'DEBUG',
     },
+    'django': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+        'propagate': True,
+    },
     'myapp': {
         'handlers': ['console'],
         'level': 'DEBUG',
@@ -132,10 +134,16 @@ LOGGING = {
     },
 }
 
+logger = logging.getLogger(__name__)
+
+redis_url = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
+logger.debug(f"Redis URL: {redis_url}")
+redis_parsed = urlparse(redis_url)
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',  # Adjust the Redis URL and database number as needed
+        'LOCATION': redis_url,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }

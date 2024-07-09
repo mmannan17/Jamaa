@@ -11,6 +11,8 @@ from .utils import get_grid
 from django.core.cache import cache
 import logging
 from django.http import HttpResponse
+from django.http import JsonResponse
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -235,6 +237,4 @@ class NearbyMosquesView(APIView):
 
 class MosqueVerificationView(APIView):
     permission_classes=[IsAuthenticated]
-
-    
 
