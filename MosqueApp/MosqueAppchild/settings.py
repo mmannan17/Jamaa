@@ -134,18 +134,15 @@ LOGGING = {
     },
 }
 
-logger = logging.getLogger(__name__)
-
-redis_url = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
-logger.debug(f"Redis URL: {redis_url}")
-redis_parsed = urlparse(redis_url)
-
+# Redis Cache Configuration
+REDIS_URL = os.getenv('REDIS_URL')
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': redis_url,
+        'LOCATION': REDIS_URL,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,  # Prevents your application from crashing if Redis is down
         }
     }
 }
