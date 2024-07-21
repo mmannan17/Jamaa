@@ -43,3 +43,4 @@ redis>=4.0.0
 # Include pywin32 conditionally
 pywin32==306; sys_platform == 'win32'
 requests==2.25.1
+celery==5.2.3

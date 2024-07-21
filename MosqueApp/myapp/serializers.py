@@ -50,7 +50,7 @@ class MosqueSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['title', 'description', 'media_file', 'mosque', 'content']
 
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,0 +1,222 @@
+INFO 2024-07-10 17:49:07,767 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-10 17:49:12,216 log Not Found: /favicon.ico
+INFO 2024-07-10 17:50:02,311 views User ant requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+DEBUG 2024-07-10 17:52:08,723 views Retrieved cache for key: grid_139_-414 with mosques: []
+DEBUG 2024-07-10 17:52:08,811 views Retrieved cache for key: grid_139_-413 with mosques: []
+DEBUG 2024-07-10 17:52:08,819 views Retrieved cache for key: grid_139_-412 with mosques: []
+DEBUG 2024-07-10 17:52:08,822 views Retrieved cache for key: grid_140_-414 with mosques: []
+DEBUG 2024-07-10 17:52:08,823 views Retrieved cache for key: grid_140_-413 with mosques: []
+DEBUG 2024-07-10 17:52:08,828 views Retrieved cache for key: grid_140_-412 with mosques: []
+DEBUG 2024-07-10 17:52:08,831 views Retrieved cache for key: grid_141_-414 with mosques: []
+DEBUG 2024-07-10 17:52:08,833 views Retrieved cache for key: grid_141_-413 with mosques: []
+DEBUG 2024-07-10 17:52:08,834 views Retrieved cache for key: grid_141_-412 with mosques: []
+INFO 2024-07-10 17:54:05,643 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 17:54:09,792 views Starting user registration
+INFO 2024-07-10 17:54:09,841 views Validation successful for role: user
+INFO 2024-07-10 17:54:10,304 views Created user: mustafla
+INFO 2024-07-10 17:59:19,112 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 17:59:19,761 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 17:59:26,219 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 17:59:26,872 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-10 17:59:45,337 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-10 18:00:03,506 views User ant requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-10 18:00:27,636 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 18:00:30,883 views User ant requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+DEBUG 2024-07-10 18:00:30,950 views Cache hit for key: grid_139_-414 in 0.06764984130859375 seconds
+DEBUG 2024-07-10 18:00:30,954 views Cache hit for key: grid_139_-413 in 0.0027201175689697266 seconds
+DEBUG 2024-07-10 18:00:30,955 views Cache hit for key: grid_139_-412 in 0.0013232231140136719 seconds
+DEBUG 2024-07-10 18:00:30,958 views Cache hit for key: grid_140_-414 in 0.0022928714752197266 seconds
+DEBUG 2024-07-10 18:00:30,960 views Cache hit for key: grid_140_-413 in 0.0022132396697998047 seconds
+DEBUG 2024-07-10 18:00:30,962 views Cache hit for key: grid_140_-412 in 0.0022242069244384766 seconds
+DEBUG 2024-07-10 18:00:30,965 views Cache hit for key: grid_141_-414 in 0.0013926029205322266 seconds
+DEBUG 2024-07-10 18:00:30,967 views Cache hit for key: grid_141_-413 in 0.0014853477478027344 seconds
+DEBUG 2024-07-10 18:00:30,970 views Cache hit for key: grid_141_-412 in 0.0021851062774658203 seconds
+INFO 2024-07-10 18:00:30,970 views Nearby mosques fetched in 0.08743429183959961 seconds
+INFO 2024-07-10 18:01:01,611 views User ant requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+DEBUG 2024-07-10 18:01:01,663 views Cache hit for key: grid_139_-414 in 0.051662445068359375 seconds
+DEBUG 2024-07-10 18:01:01,666 views Cache hit for key: grid_139_-413 in 0.0025289058685302734 seconds
+DEBUG 2024-07-10 18:01:01,667 views Cache hit for key: grid_139_-412 in 0.0010113716125488281 seconds
+DEBUG 2024-07-10 18:01:01,676 views Cache hit for key: grid_140_-414 in 0.007913589477539062 seconds
+DEBUG 2024-07-10 18:01:01,678 views Cache hit for key: grid_140_-413 in 0.0019860267639160156 seconds
+DEBUG 2024-07-10 18:01:01,678 views Cache hit for key: grid_140_-412 in 0.0 seconds
+DEBUG 2024-07-10 18:01:01,682 views Cache hit for key: grid_141_-414 in 0.0008039474487304688 seconds
+DEBUG 2024-07-10 18:01:01,685 views Cache hit for key: grid_141_-413 in 0.0015103816986083984 seconds
+DEBUG 2024-07-10 18:01:01,686 views Cache hit for key: grid_141_-412 in 0.0010089874267578125 seconds
+INFO 2024-07-10 18:01:01,687 views Nearby mosques fetched in 0.07533669471740723 seconds
+INFO 2024-07-10 18:08:07,325 views User ant requesting nearby mosques for lat: 0.0, lon: 0.0, distance: 1
+DEBUG 2024-07-10 18:10:13,702 views Cache hit for key: grid_-1_-1 in 126.37731695175171 seconds
+DEBUG 2024-07-10 18:10:13,803 views Cache hit for key: grid_-1_0 in 0.10125875473022461 seconds
+DEBUG 2024-07-10 18:10:13,807 views Cache hit for key: grid_-1_1 in 0.0017240047454833984 seconds
+DEBUG 2024-07-10 18:10:13,808 views Cache hit for key: grid_0_-1 in 0.0011749267578125 seconds
+DEBUG 2024-07-10 18:10:13,810 views Cache hit for key: grid_0_0 in 0.0023212432861328125 seconds
+DEBUG 2024-07-10 18:10:13,812 views Cache hit for key: grid_0_1 in 0.001462697982788086 seconds
+DEBUG 2024-07-10 18:10:13,814 views Cache hit for key: grid_1_-1 in 0.001888275146484375 seconds
+DEBUG 2024-07-10 18:10:13,818 views Cache hit for key: grid_1_0 in 0.003835916519165039 seconds
+DEBUG 2024-07-10 18:10:13,820 views Cache hit for key: grid_1_1 in 0.0017299652099609375 seconds
+INFO 2024-07-10 18:10:13,820 views Nearby mosques fetched in 126.49503540992737 seconds
+WARNING 2024-07-10 18:29:49,904 log Unauthorized: /MosqueApp/register/
+INFO 2024-07-10 18:30:16,030 views User ant requesting nearby mosques for lat: 0.0, lon: 0.0, distance: 1
+DEBUG 2024-07-10 18:32:22,359 views Cache hit for key: grid_-1_-1 in 126.32895731925964 seconds
+DEBUG 2024-07-10 18:32:22,483 views Cache hit for key: grid_-1_0 in 0.12221312522888184 seconds
+DEBUG 2024-07-10 18:32:22,486 views Cache hit for key: grid_-1_1 in 0.003080606460571289 seconds
+DEBUG 2024-07-10 18:32:22,488 views Cache hit for key: grid_0_-1 in 0.0021021366119384766 seconds
+DEBUG 2024-07-10 18:32:22,489 views Cache hit for key: grid_0_0 in 0.0010037422180175781 seconds
+DEBUG 2024-07-10 18:32:22,491 views Cache hit for key: grid_0_1 in 0.002511262893676758 seconds
+DEBUG 2024-07-10 18:32:22,493 views Cache hit for key: grid_1_-1 in 0.0012407302856445312 seconds
+DEBUG 2024-07-10 18:32:22,494 views Cache hit for key: grid_1_0 in 0.0015337467193603516 seconds
+DEBUG 2024-07-10 18:32:22,496 views Cache hit for key: grid_1_1 in 0.0020062923431396484 seconds
+INFO 2024-07-10 18:32:22,496 views Nearby mosques fetched in 126.46565127372742 seconds
+INFO 2024-07-10 18:34:21,409 views User ant requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+DEBUG 2024-07-10 18:34:21,499 views Cache hit for key: grid_139_-414 in 0.0900881290435791 seconds
+DEBUG 2024-07-10 18:34:21,501 views Cache hit for key: grid_139_-413 in 0.002063274383544922 seconds
+DEBUG 2024-07-10 18:34:21,503 views Cache hit for key: grid_139_-412 in 0.002504587173461914 seconds
+DEBUG 2024-07-10 18:34:21,503 views Cache hit for key: grid_140_-414 in 0.0 seconds
+DEBUG 2024-07-10 18:34:21,509 views Cache hit for key: grid_140_-413 in 0.005890607833862305 seconds
+DEBUG 2024-07-10 18:34:21,512 views Cache hit for key: grid_140_-412 in 0.002032041549682617 seconds
+DEBUG 2024-07-10 18:34:21,514 views Cache hit for key: grid_141_-414 in 0.0014994144439697266 seconds
+DEBUG 2024-07-10 18:34:21,516 views Cache hit for key: grid_141_-413 in 0.002355337142944336 seconds
+DEBUG 2024-07-10 18:34:21,517 views Cache hit for key: grid_141_-412 in 0.00025463104248046875 seconds
+INFO 2024-07-10 18:34:21,517 views Nearby mosques fetched in 0.10869121551513672 seconds
+WARNING 2024-07-10 18:35:34,099 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-10 18:36:09,143 views User ant requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+DEBUG 2024-07-10 18:38:15,469 views Cache hit for key: grid_139_-414 in 126.32561087608337 seconds
+DEBUG 2024-07-10 18:40:21,827 views Cache hit for key: grid_139_-413 in 126.35793828964233 seconds
+DEBUG 2024-07-10 18:40:21,932 views Cache hit for key: grid_139_-412 in 0.10522174835205078 seconds
+DEBUG 2024-07-10 18:40:21,937 views Cache hit for key: grid_140_-414 in 0.005021572113037109 seconds
+DEBUG 2024-07-10 18:40:21,937 views Cache hit for key: grid_140_-413 in 0.0 seconds
+DEBUG 2024-07-10 18:40:21,952 views Cache hit for key: grid_140_-412 in 0.014750242233276367 seconds
+DEBUG 2024-07-10 18:40:21,955 views Cache hit for key: grid_141_-414 in 0.0033330917358398438 seconds
+DEBUG 2024-07-10 18:40:21,957 views Cache hit for key: grid_141_-413 in 0.0015256404876708984 seconds
+DEBUG 2024-07-10 18:40:21,959 views Cache hit for key: grid_141_-412 in 0.0013315677642822266 seconds
+INFO 2024-07-10 18:40:21,959 views Nearby mosques fetched in 252.81577515602112 seconds
+INFO 2024-07-10 18:43:38,600 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 18:43:42,091 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 18:44:17,278 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 18:44:18,010 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 18:44:26,613 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 18:44:27,260 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 18:45:44,910 views Starting user registration
+WARNING 2024-07-10 18:45:44,911 log Bad Request: /MosqueApp/register/
+INFO 2024-07-10 18:45:58,845 views Starting user registration
+INFO 2024-07-10 18:45:58,981 views Validation successful for role: mosque
+DEBUG 2024-07-10 18:45:59,008 connectionpool Starting new HTTPS connection (1): api.geoapify.com:443
+DEBUG 2024-07-10 18:46:00,717 connectionpool https://api.geoapify.com:443 "GET /v1/geocode/search?text=4801+E+Busch+Blvd%2C+Tampa%2C+FL+33617&apiKey=b0e7b806b43241b885e46ebcdb5b3932 HTTP/1.1" 200 None
+INFO 2024-07-10 18:46:00,729 views Retrieved location for address 4801 E Busch Blvd, Tampa, FL 33617: lat=28.032552, lon=-82.40719
+INFO 2024-07-10 18:46:01,141 views Created user: Umar in 0.41 seconds
+INFO 2024-07-10 18:46:01,578 views Assigned permissions to user: [<Permission: Myapp | mosque | Can change prayer times>, <Permission: Myapp | mosque | Can post announcements>, <Permission: Myapp | mosque | Can put up events>, <Permission: Myapp | mosque | Can post pictures and videos>]
+INFO 2024-07-10 18:46:01,615 views Created mosque: Mosque object (38) in 0.04 seconds
+ERROR 2024-07-10 18:48:08,170 log Internal Server Error: /MosqueApp/register/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 276, in connect
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\retry.py", line 51, in call_with_retry
+    raise error
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\retry.py", line 46, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 277, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 639, in _connect
+    raise err
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 627, in _connect
+    sock.connect(socket_address)
+TimeoutError: [WinError 10060] A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 85, in post
+    with cache.lock(cache_key):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\lock.py", line 158, in __enter__
+    if self.acquire():
+       ^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\lock.py", line 210, in acquire
+    if self.do_acquire(token):
+       ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\lock.py", line 226, in do_acquire
+    if self.redis.set(self.name, token, nx=True, px=timeout):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\commands\core.py", line 2342, in set
+    return self.execute_command("SET", *pieces, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\client.py", line 542, in execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 1109, in get_connection
+    connection.connect()
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\redis\connection.py", line 280, in connect
+    raise TimeoutError("Timeout connecting to server")
+redis.exceptions.TimeoutError: Timeout connecting to server
+INFO 2024-07-10 18:53:09,557 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 18:53:10,205 autoreload Watching for file changes with StatReloader
+INFO 2024-07-10 18:53:25,236 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-10 18:53:25,852 autoreload Watching for file changes with StatReloader
+INFO 2024-07-11 23:32:13,964 autoreload Watching for file changes with StatReloader
+INFO 2024-07-11 23:35:14,686 autoreload Watching for file changes with StatReloader
+INFO 2024-07-11 23:37:27,285 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-11 23:37:35,221 log Not Found: /favicon.ico
+INFO 2024-07-11 23:42:10,308 views User ant requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+DEBUG 2024-07-11 23:43:36,346 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,347 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-07-11 23:43:36,348 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,349 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,349 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,350 functional 
+def refresh_cache():
+    return 1
+
+DEBUG 2024-07-11 23:43:36,350 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,351 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,354 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-07-11 23:43:36,354 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+

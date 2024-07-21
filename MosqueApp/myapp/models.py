@@ -57,7 +57,7 @@ class Post(models.Model):
     posttype = models.TextField(max_length=30, blank=True)
     content = models.TextField()
     media_type = models.CharField(max_length=20, blank=True)
-    media_url = models.CharField(max_length=255, blank=True)
+    media_file = models.FileField(upload_to='media/', default='placeholder_media')
     events = models.CharField(max_length=255, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(CustomUser, related_name='liked_posts', blank=True)

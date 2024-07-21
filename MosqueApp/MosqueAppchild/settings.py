@@ -99,6 +99,7 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Updated Logging Configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -117,18 +118,23 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'formatter': 'verbose',
+        },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'DEBUG',
     },
     'django': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'DEBUG',
         'propagate': True,
     },
     'myapp': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'DEBUG',
         'propagate': True,
     },
@@ -146,3 +152,24 @@ CACHES = {
         }
     }
 }
+
+
+# Celery Configuration Options
+CELERY_BROKER_URL = REDIS_URL # Replace with your actual Redis endpoint
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'refresh-cache-every-hour': {
+        'task': 'myapp.tasks.refresh_cache',
+        'schedule': crontab(minute=0, hour='*'),  
+    },
+}
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
