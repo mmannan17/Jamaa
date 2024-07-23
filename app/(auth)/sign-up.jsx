@@ -24,7 +24,9 @@ const SignUp = () => {
         username: form.username,
         email: form.email,
         password: form.password,
-        role:"user"
+        role:"user",
+        latitude: 12.0,
+        longitude: 12.0
       };
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);

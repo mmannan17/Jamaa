@@ -16,7 +16,7 @@ const [form, setForm] = useState ({
 const [isSubmitting, setisSubmitting] = useState(false)
 
 const submit = async () => {
-  setIsSubmitting(true);
+  setisSubmitting(true);
   try {
     const userData = {
       username: form.email, // Assuming you're using email as the username
@@ -30,7 +30,7 @@ const submit = async () => {
     console.error('Error logging in:', error);
     // Optionally, show an error message to the user
   } finally {
-    setIsSubmitting(false);
+    setisSubmitting(false);
   }
 };
 
