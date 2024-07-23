@@ -24,7 +24,7 @@ export const getLatestPosts = async () => {
 
 export const registerUser = async (userData) => {
     try {
-      const response = await axios.post(`${API_URL}/register/`, userData);
+      const response = await axios.post(`${API_URL}/MosqueApp/register/`, userData);
       return response.data;
     } catch (error) {
       console.error('Error registering user:', error);
