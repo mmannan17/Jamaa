@@ -9,38 +9,26 @@ import { getAllPosts, getLatestPosts } from '../../apiRequests'
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
-  const [latestPosts, setLatestPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false)
 
-  // const fetchPosts = async () => {
-  //   try {
-  //     const data = await getAllPosts();
-  //     setPosts(data);
-  //   } catch (error) {
-  //     console.error('Error fetching posts:', error);
-  //   }
-  // };
-
-  // const fetchLatestPosts = async () => {
-  //   try {
-  //     const data = await getLatestPosts();
-  //     setLatestPosts(data);
-  //   } catch (error) {
-  //     console.error('Error fetching latest posts:', error);
-  //   }
-  // };
+  const fetchPosts = async () => {
+    try {
+      const data = await getAllPosts();
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchPosts();
-    await fetchLatestPosts();
     setRefreshing(false);
   }
 
-  // useEffect(() => {
-  //   fetchPosts();
-  //   fetchLatestPosts();
-  // }, []);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -78,7 +66,7 @@ const Home = () => {
               Latest Videos
             </Text>
 
-            <Trending posts={latestPosts} />
+            <Trending posts={posts} />
 
           </View>
         </View>
