@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
-import { Link } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { registerUser } from '../../apiRequests';
 
@@ -16,6 +16,8 @@ const SignUp = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigation = useNavigation(); // Use the navigation hook
+
 
   const submit = async () => {
     setIsSubmitting(true);
@@ -31,6 +33,8 @@ const SignUp = () => {
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);
       // Optionally, redirect to another page or show a success message
+      navigation.navigate('sign-in'); // Make sure 'sign-in' matches your route name
+
     } catch (error) {
       console.error('Error registering user:', error);
       // Optionally, show an error message to the user
