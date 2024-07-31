@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
-import { Link } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { registerUser } from '../../apiRequests';
 
@@ -12,10 +12,13 @@ const SignUp = () => {
   const [form, setForm] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    address: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigation = useNavigation(); // Use the navigation hook
+
 
   const submit = async () => {
     setIsSubmitting(true);
@@ -24,13 +27,18 @@ const SignUp = () => {
         username: form.username,
         email: form.email,
         password: form.password,
+        address: form.address,
         role:"mosque"
       };
       const response = await registerUser(userData);
+      navigation.navigate('sign-in'); // Make sure 'sign-in' matches your route name
+
+
       console.log('User registered successfully:', response);
       // Optionally, redirect to another page or show a success message
     } catch (error) {
       console.error('Error registering user:', error);
+
       // Optionally, show an error message to the user
     } finally {
       setIsSubmitting(false);
@@ -72,11 +80,10 @@ const SignUp = () => {
 
         <FormField
             title="Mosque Address"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            value={form.address}
+            handleChangeText={(e) => setForm({ ...form, address: e })}
             otherStyles="mt-7"
             placeholder= "Enter Address"
-            keyboardType="address"
           />
 
           <CustomButton
