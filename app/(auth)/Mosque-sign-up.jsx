@@ -72,8 +72,8 @@ const SignUp = () => {
 
         <FormField
             title="Mosque Address"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            value={form.address}
+            handleChangeText={(e) => setForm({ ...form, address: e })}
             otherStyles="mt-7"
             placeholder= "Enter Address"
             keyboardType="address"
