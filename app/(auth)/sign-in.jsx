@@ -1,38 +1,41 @@
 import { View, Text, ScrollView, Image } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {images} from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
-import {Link} from 'expo-router';
-import { loginUser } from '../../apiRequests';
+import { Link, useRouter } from 'expo-router';
+import { Context } from '../../components/globalContext';
+
 
 const SignIn = () => {
-const [form, setForm] = useState ({
-  email: '',
+  const globalContext = useContext(Context);
+  const { login } = globalContext;
+  const router = useRouter();
+
+  const [form, setForm] = useState ({
+  username: '',
   password: ''
 })
 
-const [isSubmitting, setisSubmitting] = useState(false)
+const [isSubmitting, setisSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-const submit = async () => {
-  setisSubmitting(true);
-  try {
-    const userData = {
-      username: form.email, // Assuming you're using email as the username
-      password: form.password,
-    };
-    const response = await loginUser(userData);
-    console.log('User logged in successfully:', response);
-    // Optionally, save the token and navigate to another screen
-    // e.g., save the token in async storage and navigate to the home screen
-  } catch (error) {
-    console.error('Error logging in:', error);
-    // Optionally, show an error message to the user
-  } finally {
+  const submit = async () => {
+    console.log('submitting');
+    setisSubmitting(true);
+    setError(null);
+
+    try {
+      await login(form.username, form.password);
+      router.push('/home')
+    } 
+    
+    catch (err) {
+      setError(err.message);
+    }
     setisSubmitting(false);
-  }
-};
+  };
 
   return (
     <SafeAreaView className ="bg-primary h-full">
@@ -43,12 +46,12 @@ const submit = async () => {
         <Text className = "text-2xl text-white mt-10 font-psemibold">Log in to Masjidy</Text>
         
         <FormField 
-        title= "Email"
-        value={form.email}
-        handleChangeText ={(e) => setForm ({ ...form, email: e})}
+        title= "Username"
+        value={form.username}
+        handleChangeText ={(e) => setForm ({ ...form, username: e})}
         otherStyles="mt-7"
-        keyboardType="email-address"
-        placeholder="Enter Email Address"
+        keyboardType="username"
+        placeholder="Enter Username"
         />
 
         <FormField 

@@ -5,7 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import { images } from '../constants';
 import CustomButton from '../components/CustomButton';
 
-export default function App() {
+export default function LandingPage() {
   return (
     <SafeAreaView className = 'bg-primary h-full'>
       <ScrollView contentContainerStyle = {{height: '100%'}}>
