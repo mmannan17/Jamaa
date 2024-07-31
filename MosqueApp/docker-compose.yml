@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  worker:
+    image: 767397976083.dkr.ecr.us-east-1.amazonaws.com/masjidapp:worker-latest
+    container_name: masjidapp-worker
+    network_mode: "host"
+    dns:
+      - 10.0.0.2
+    environment:
+      - SECRET_KEY
+      - DEBUG
+      - ALLOWED_HOSTS
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_PORT
+      - API_KEY
+      - GEO_API
+      - REDIS_URL
+      

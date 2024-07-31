@@ -220,3 +220,135 @@ DEBUG 2024-07-11 23:43:36,354 functional
 def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
     return 1
 
+INFO 2024-07-24 20:23:01,156 autoreload Watching for file changes with StatReloader
+INFO 2024-07-24 20:23:25,174 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-24 20:23:37,026 log Unauthorized: /MosqueApp/nearby_mosques/
+WARNING 2024-07-24 20:23:49,459 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-24 20:24:04,871 views User Umar requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+DEBUG 2024-07-24 20:26:11,252 views Cache miss for key: grid_139_-414. Populating cache.
+ERROR 2024-07-24 20:26:11,472 log Internal Server Error: /MosqueApp/nearby_mosques/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\options.py", line 681, in get_field
+    return self.fields_map[field_name]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 290, in get
+    mosques_in_grid = list(Mosque.objects.filter(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 400, in __iter__
+    self._fetch_all()
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 256, in get_select
+    select_mask = self.query.get_select_mask()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\query.py", line 877, in get_select_mask
+    return self._get_only_select_mask(opts, mask)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\query.py", line 840, in _get_only_select_mask
+    field = opts.get_field(field_name)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\options.py", line 683, in get_field
+    raise FieldDoesNotExist(
+django.core.exceptions.FieldDoesNotExist: Mosque has no field named 'id'
+INFO 2024-07-30 19:36:39,823 autoreload Watching for file changes with StatReloader
+INFO 2024-07-30 19:37:32,332 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-30 19:38:50,572 log Not Found: /login/
+INFO 2024-07-30 19:39:05,774 views Authenticating user with email: umar2@example.com
+ERROR 2024-07-30 19:39:06,494 views Authentication failed for user: umar2@example.com
+WARNING 2024-07-30 19:39:06,494 log Unauthorized: /MosqueApp/login/
+INFO 2024-07-30 19:39:41,482 views Authenticating user with email: umar2@example.com
+ERROR 2024-07-30 19:39:42,219 views Authentication failed for user: umar2@example.com
+WARNING 2024-07-30 19:39:42,220 log Unauthorized: /MosqueApp/login/
+INFO 2024-07-30 19:49:32,123 autoreload Watching for file changes with StatReloader
+INFO 2024-07-30 19:49:35,595 views Authenticating user with email: umar2@example.com
+ERROR 2024-07-30 19:49:36,223 views Authentication failed for user: umar2@example.com
+WARNING 2024-07-30 19:49:36,224 log Unauthorized: /MosqueApp/login/
+INFO 2024-07-30 19:54:34,511 autoreload Watching for file changes with StatReloader
+INFO 2024-07-30 19:54:40,459 views Authenticating user with email: umar2@example.com and password: exampleuser
+INFO 2024-07-30 19:54:41,219 views Authentication result for umar2@example.com: None
+ERROR 2024-07-30 19:54:41,220 views Authentication failed for user: umar2@example.com
+WARNING 2024-07-30 19:54:41,220 log Unauthorized: /MosqueApp/login/
+INFO 2024-07-30 19:56:11,356 views Authenticating user with email: um2ar and password: exampleuser
+INFO 2024-07-30 19:56:12,024 views Authentication result for um2ar: None
+ERROR 2024-07-30 19:56:12,024 views Authentication failed for user: um2ar
+WARNING 2024-07-30 19:56:12,025 log Unauthorized: /MosqueApp/login/
+ERROR 2024-07-30 19:56:19,942 log Internal Server Error: /MosqueApp/login/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 395, in post
+    email = request.data.get('email').lower()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'lower'
+INFO 2024-07-30 19:59:14,810 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-30 19:59:15,604 autoreload Watching for file changes with StatReloader
+INFO 2024-07-30 19:59:24,604 views Authenticating user with username: Um2ar
+INFO 2024-07-30 19:59:25,291 views Authentication result for Um2ar: Um2ar
+INFO 2024-07-30 19:59:51,975 views Authenticating user with username: Um2ar
+INFO 2024-07-30 19:59:52,669 views Authentication result for Um2ar: Um2ar
+INFO 2024-07-30 20:00:40,239 views Authenticating user with username: Umar
+INFO 2024-07-30 20:00:41,285 views Authentication result for Umar: Umar
+INFO 2024-07-30 20:00:55,267 views Authenticating user with username: ant
+INFO 2024-07-30 20:00:55,998 views Authentication result for ant: ant

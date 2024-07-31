@@ -13,9 +13,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the current directory contents into the container at /app
 COPY . .
 
+# Copy the .env file
+COPY .env .env
+
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=MosqueAppchild.settings
 ENV PYTHONPATH=/app/MosqueApp
+
+# Set the DNS resolver
+RUN echo "nameserver 10.0.0.2" > /etc/resolv.conf
+
+# Print environment variables for debugging
+RUN printenv
 
 # Run the Celery worker
 CMD ["celery", "-A", "MosqueAppchild", "worker", "--loglevel=info"]

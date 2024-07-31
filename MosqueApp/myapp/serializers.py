@@ -3,12 +3,25 @@ from .models import CustomUser, Mosque, Post, Follow
 from .utils import get_grid
 from .updatelocation import get_location
 
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['post_id', 'mosque', 'posttype', 'content', 'media_type', 'media_file', 'events', 'timestamp', 'likes']
+
+class MosqueSerializer(serializers.ModelSerializer):
+    posts = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Mosque
+        fields = ['mosque_id', 'mosquename', 'email', 'description', 'profile_pic', 'prayer_times', 'address', 'lat', 'lon', 'grid_cell_lat', 'grid_cell_lon', 'nonprofitform', 'posts']
+
 class CustomUserSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False)
+    mosque = MosqueSerializer(read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'role', 'password', 'latitude', 'longitude', 'address']
+        fields = ['id', 'username', 'email', 'role', 'password', 'latitude', 'longitude', 'address', 'mosque']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
@@ -41,16 +54,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 )
         
         return user
-
-class MosqueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Mosque
-        fields = '__all__'
-
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['title', 'description', 'media_file', 'mosque', 'content']
 
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:

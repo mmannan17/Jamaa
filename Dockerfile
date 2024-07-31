@@ -16,9 +16,9 @@ COPY . .
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-# Define environment variable
+# Define environment variables
 ENV DJANGO_SETTINGS_MODULE=MosqueAppchild.settings
 ENV PYTHONPATH=/app/MosqueApp
 
-# Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run the migration script and then start the Django server
+CMD ["sh", "-c", "if [ \"$RUN_MIGRATIONS\" = \"true\" ]; then python manage.py migrate; fi && python manage.py runserver 0.0.0.0:8000"]

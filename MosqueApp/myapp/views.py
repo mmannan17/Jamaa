@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 from .models import CustomUser, Mosque, Post, Follow
 from .serializers import CustomUserSerializer, MosqueSerializer, PostSerializer, FollowSerializer
 from django.contrib.auth.models import Permission
@@ -14,7 +15,7 @@ from django.http import HttpResponse
 import time
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -312,3 +313,116 @@ class MosqueVerificationView(APIView):
         logger.info(f"User {request.user} attempting to verify mosque")
         # Add your verification logic here
         return Response({'status': 'Mosque verification logic not implemented'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+class GetUsersView(ListAPIView):
+    """
+    View to list all users or filter users by mosquename.
+    """
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = CustomUser.objects.all()
+        mosquename = self.request.query_params.get('mosquename', None)
+        if mosquename is not None:
+            queryset = queryset.filter(mosque__mosquename=mosquename)
+        return queryset
+
+class GetUserDetailView(RetrieveAPIView):
+    """
+    View to retrieve a user by ID.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+class GetPostsView(ListAPIView):
+    """
+    View to list all posts or filter posts by mosquename.
+    """
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        mosquename = self.request.query_params.get('mosquename', None)
+        if mosquename is not None:
+            queryset = queryset.filter(mosque__mosquename=mosquename)
+        return queryset
+
+class GetPostDetailView(RetrieveAPIView):
+    """
+    View to retrieve a post by ID.
+    """
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class UserProfileView(APIView):
+    """
+    View to retrieve a mosque's profile along with their posts.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        mosque_id = request.query_params.get('mosque_id')
+        mosquename = request.query_params.get('mosquename')
+        
+        try:
+            if mosque_id:
+                mosque = Mosque.objects.get(mosque_id=mosque_id)
+            elif mosquename:
+                mosque = Mosque.objects.get(mosquename=mosquename)
+            else:
+                user = request.user
+                if user.role != 'mosque':
+                    return Response({'error': 'Profile not available'}, status=status.HTTP_403_FORBIDDEN)
+                mosque = user.mosque
+        except Mosque.DoesNotExist:
+            return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = CustomUserSerializer(mosque.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate, get_user_model
+from .serializers import CustomUserSerializer
+import logging
+
+logger = logging.getLogger(__name__)
+
+User = get_user_model()
+
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if username is None or password is None:
+            return Response({'error': 'Please provide both username and password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        logger.info(f"Authenticating user with username: {username}")
+
+        user = authenticate(request, username=username, password=password)
+        logger.info(f"Authentication result for {username}: {user}")
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': CustomUserSerializer(user).data
+            }, status=status.HTTP_200_OK)
+        else:
+            logger.error(f"Authentication failed for user: {username}")
+            return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -36,7 +36,7 @@ class Mosque(models.Model):
     description = models.TextField(blank=True)
     profile_pic = models.CharField(max_length=255, blank=True)
     prayer_times = models.CharField(max_length=255)
-    address = models.CharField(max_length=255, unique=True)
+    address = models.CharField(max_length=255, unique=True,blank=False,default='')
     lat = models.FloatField(default=0.0)
     lon = models.FloatField(default=0.0)
     grid_cell_lat = models.IntegerField(default=0)
@@ -53,7 +53,7 @@ class Mosque(models.Model):
 
 class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
-    mosque = models.ForeignKey(Mosque, on_delete=models.CASCADE)
+    mosque = models.ForeignKey(Mosque, on_delete=models.CASCADE, related_name='posts')
     posttype = models.TextField(max_length=30, blank=True)
     content = models.TextField()
     media_type = models.CharField(max_length=20, blank=True)
