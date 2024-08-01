@@ -1,34 +1,18 @@
 import { View, Text, FlatList, Image, RefreshControl } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from '../../constants'
 import SearchInput from '../../components/SearchInput'
 import Trending from '../../components/Trending'
 import EmptyState from '../../components/EmptyState'
 import { getAllPosts, getLatestPosts } from '../../apiRequests'
+import { Context } from '../../components/globalContext'
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [latestPosts, setLatestPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false)
-
-  // const fetchPosts = async () => {
-  //   try {
-  //     const data = await getAllPosts();
-  //     setPosts(data);
-  //   } catch (error) {
-  //     console.error('Error fetching posts:', error);
-  //   }
-  // };
-
-  // const fetchLatestPosts = async () => {
-  //   try {
-  //     const data = await getLatestPosts();
-  //     setLatestPosts(data);
-  //   } catch (error) {
-  //     console.error('Error fetching latest posts:', error);
-  //   }
-  // };
+  const { user } = useContext(Context);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -37,10 +21,6 @@ const Home = () => {
     setRefreshing(false);
   }
 
-  // useEffect(() => {
-  //   fetchPosts();
-  //   fetchLatestPosts();
-  // }, []);
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -55,10 +35,10 @@ const Home = () => {
           <View className="flex-row justify-between items-start">
             <View>
               <Text className="font-pmedium text-sm text-gray-100">
-                Welcome Back
+                Salam
               </Text>
               <Text className="text-2xl font-psemibold text-white">
-                Kareem
+                {user ? user.username : 'User'}
               </Text>
             </View>
             

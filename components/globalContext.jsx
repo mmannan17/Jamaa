@@ -25,6 +25,7 @@ const Provider = ( { children } ) => {
           await AsyncStorage.setItem('authToken', data.access);
           setAuthToken(data.access);
           setUser(data.user); // Set user info
+          console.log(user)
           setIsLoggedIn(true);
         } else {
           throw new Error(data.detail || 'Login failed');
@@ -72,6 +73,7 @@ const Provider = ( { children } ) => {
         login,
         logout,
         getPosts,
+        user,
     };
 
     return (
