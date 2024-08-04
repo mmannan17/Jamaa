@@ -36,12 +36,12 @@ class Mosque(models.Model):
     description = models.TextField(blank=True)
     profile_pic = models.CharField(max_length=255, blank=True)
     prayer_times = models.CharField(max_length=255)
-    address = models.CharField(max_length=255, unique=True,blank=False,default='')
+    address = models.CharField(max_length=255, unique=True, blank=False, default='')
     lat = models.FloatField(default=0.0)
     lon = models.FloatField(default=0.0)
     grid_cell_lat = models.IntegerField(default=0)
     grid_cell_lon = models.IntegerField(default=0)
-    nonprofitform= models.FileField(upload_to='mosque_verification/',blank=False, null=False,default='placeholder.pdf')
+    nonprofitform = models.FileField(upload_to='mosque_verification/', blank=False, null=False, default='placeholder.pdf')
 
     class Meta:
         permissions = [
@@ -69,3 +69,15 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = (('user', 'mosque'),)
+
+
+class Events(models.Model):
+    mosque = models.ForeignKey(Mosque, on_delete=models.CASCADE, related_name='events')
+    event_title = models.CharField(max_length=255)
+    event_date = models.DateTimeField()
+    location = models.CharField(max_length=255)
+    event_description = models.TextField()
+    rsvp = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.event_title

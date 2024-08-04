@@ -5,17 +5,21 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import CustomUser, Mosque, Post, Follow
-from .serializers import CustomUserSerializer, MosqueSerializer, PostSerializer, FollowSerializer
+from .serializers import CustomUserSerializer, MosqueSerializer, PostEventForm, PostSerializer,FollowSerializer
 from django.contrib.auth.models import Permission
 from .updatelocation import get_location
 from .utils import get_grid
 from django.core.cache import cache
+from .models import Events
 import logging
 from django.http import HttpResponse
 import time
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from .utils import haversine,get_grid,GRID_SIZE
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -81,15 +85,6 @@ class RegisterUserView(APIView):
                 mosque_creation_time = time.time() - mosque_start_time
                 logger.info(f"Created mosque: {mosque} in {mosque_creation_time:.2f} seconds")
 
-                cache_key = f'grid_{grid_lat}_{grid_lon}'
-                cache_start_time = time.time()
-                with cache.lock(cache_key):
-                    cache_mosques = cache.get(cache_key, [])
-                    cache_mosques.append(mosque)
-                    cache.set(cache_key, cache_mosques, timeout=CACHE_TTL)
-                cache_update_time = time.time() - cache_start_time
-                logger.debug(f"Set cache for key: {cache_key} with mosque: {mosque} in {cache_update_time:.2f} seconds")
-
             elif role == 'user':
                 latitude = request.data.get('latitude')
                 longitude = request.data.get('longitude')
@@ -124,6 +119,7 @@ class RegisterUserView(APIView):
         
         logger.error(f"User registration failed: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UpdateMosqueView(APIView):
@@ -228,14 +224,13 @@ class PostEventView(APIView):
             logger.error(f"Permission denied for user {request.user} to post event")
             return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
-        serializer = PostSerializer(data=request.data)
+        serializer = PostEventForm(data=request.data)
         if serializer.is_valid():
             serializer.save()
             logger.info(f"Event posted: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.error(f"Post event failed: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LikePostView(APIView):
     permission_classes = [IsAuthenticated]
@@ -265,45 +260,74 @@ class LikePostView(APIView):
         return Response({'status': 'Post unliked'}, status=status.HTTP_200_OK)
 
 
+# views.py
+import time
+import logging
+from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .models import Mosque
+from .serializers import MosqueSerializer
+from .utils import get_grid, haversine  # Importing functions from utils.py
+
+logger = logging.getLogger(__name__)
+
+
+
+
+AVERAGE_DRIVING_SPEED_MPH = 45  
+DRIVING_TIME_MINUTES = 30  
+DRIVING_DISTANCE_MILES = (AVERAGE_DRIVING_SPEED_MPH / 60) * DRIVING_TIME_MINUTES  
+KM_TO_MILES = 0.621371  
+
 class NearbyMosquesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         lat = float(request.query_params.get('lat'))
         lon = float(request.query_params.get('lon'))
-        distance = int(request.query_params.get('distance', 1))  
-        logger.info(f"User {request.user} requesting nearby mosques for lat: {lat}, lon: {lon}, distance: {distance}")
+        distance_miles = DRIVING_DISTANCE_MILES  #max mosque distance is within a 30 minute drive
+
+        logger.info(f"User {request.user} requesting nearby mosques for lat: {lat}, lon: {lon}, distance: {distance_miles} miles")
+
+        # Convert driving distance in miles to kilometers 
+        distance_km = distance_miles / KM_TO_MILES
 
         grid_lat, grid_lon = get_grid(lat, lon)
-        mosques = []
+        radius_in_degrees = distance_km / 111  # Convert distance to degrees
+        grid_radius = int(radius_in_degrees / GRID_SIZE) + 1
 
         start_time = time.time()
 
-        for dlat in range(-distance, distance + 1):
-            for dlon in range(-distance, distance + 1):
-                cache_key = f'grid_{grid_lat + dlat}_{grid_lon + dlon}'
-                cache_start_time = time.time()
-                cached_mosques = cache.get(cache_key)
+        # Query to get nearby grids
+        nearby_grids_query = Q()
+        for dx in range(-grid_radius, grid_radius + 1):
+            for dy in range(-grid_radius, grid_radius + 1):
+                nearby_grids_query |= Q(grid_cell_lat=grid_lat + dx, grid_cell_lon=grid_lon + dy)
 
-                if cached_mosques is None:
-                    logger.debug(f"Cache miss for key: {cache_key}. Populating cache.")
-                    mosques_in_grid = list(Mosque.objects.filter(
-                        grid_cell_lat=grid_lat + dlat,
-                        grid_cell_lon=grid_lon + dlon
-                    ).only('id', 'mosquename', 'address'))  # Optimize the query to only fetch required fields
-                    cache.set(cache_key, mosques_in_grid, timeout=86400)
-                    logger.debug(f"Cache populated for key: {cache_key}")
-                else:
-                    mosques.extend(cached_mosques)
-                    cache_time = time.time() - cache_start_time
-                    logger.debug(f"Cache hit for key: {cache_key} in {cache_time:.2f} seconds")
+        # Fetching mosques in the nearby grids
+        nearby_mosques = Mosque.objects.filter(nearby_grids_query).only('mosque_id', 'lat', 'lon')
+
+        # Filter mosques by actual distance and sort by closest distance
+        mosques = []
+        for mosque in nearby_mosques:
+            distance_to_mosque_km = haversine(lat, lon, mosque.lat, mosque.lon)
+            distance_to_mosque_miles = distance_to_mosque_km * KM_TO_MILES
+            if distance_to_mosque_miles <= distance_miles:
+                mosques.append({
+                    'id': mosque.mosque_id,
+                    'distance_miles': f"{distance_to_mosque_miles:.2f}"
+                })
+
+        # Sort mosques by distance_miles
+        mosques.sort(key=lambda x: x['distance_miles'])
 
         total_time = time.time() - start_time
         logger.info(f"Nearby mosques fetched in {total_time:.2f} seconds")
 
-        serializer = MosqueSerializer(mosques, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        return Response(mosques, status=status.HTTP_200_OK)
 
 
 class MosqueVerificationView(APIView):
@@ -362,7 +386,7 @@ class GetPostDetailView(RetrieveAPIView):
 
 class UserProfileView(APIView):
     """
-    View to retrieve a mosque's profile along with their posts.
+    View to retrieve a mosque's profile along with their posts and events.
     """
     permission_classes = [IsAuthenticated]
 
@@ -372,9 +396,9 @@ class UserProfileView(APIView):
         
         try:
             if mosque_id:
-                mosque = Mosque.objects.get(mosque_id=mosque_id)
+                mosque = get_object_or_404(Mosque, mosque_id=mosque_id)
             elif mosquename:
-                mosque = Mosque.objects.get(mosquename=mosquename)
+                mosque = get_object_or_404(Mosque, mosquename=mosquename)
             else:
                 user = request.user
                 if user.role != 'mosque':
@@ -383,10 +407,8 @@ class UserProfileView(APIView):
         except Mosque.DoesNotExist:
             return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = CustomUserSerializer(mosque.user)
+        serializer = MosqueSerializer(mosque)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -426,3 +448,39 @@ class UserLoginView(APIView):
         else:
             logger.error(f"Authentication failed for user: {username}")
             return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class NearbyEventsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        lat = float(request.query_params.get('lat'))
+        lon = float(request.query_params.get('lon'))
+
+        logger.info(f"User {request.user} requesting nearby events for lat: {lat}, lon: {lon}")
+
+        # Call the existing nearby mosques view to get nearby mosques
+        nearby_mosques_view = NearbyMosquesView()
+        mosques_response = nearby_mosques_view.get(request).data
+
+        # Extract mosque IDs from the response
+        mosque_ids = [mosque['id'] for mosque in mosques_response]
+
+        # Fetch events for the nearby mosques
+        events = Events.objects.filter(mosque_id__in=mosque_ids).order_by('event_date')
+
+        events_list = []
+        for event in events:
+            events_list.append({
+                'mosque_id': event.mosque_id,
+                'event_title': event.event_title,
+                'event_date': event.event_date,
+                'location': event.location,
+                'event_description': event.event_description,
+                'rsvp': event.rsvp
+            })
+
+        logger.info(f"Nearby events fetched successfully")
+
+        return Response(events_list, status=status.HTTP_200_OK)

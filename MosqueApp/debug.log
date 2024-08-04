@@ -352,3 +352,346 @@ INFO 2024-07-30 20:00:40,239 views Authenticating user with username: Umar
 INFO 2024-07-30 20:00:41,285 views Authentication result for Umar: Umar
 INFO 2024-07-30 20:00:55,267 views Authenticating user with username: ant
 INFO 2024-07-30 20:00:55,998 views Authentication result for ant: ant
+INFO 2024-07-31 01:49:15,479 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:49:45,453 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:49:46,321 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:50:24,298 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:50:25,118 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:50:27,434 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:50:28,297 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:50:30,601 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:50:31,491 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:50:33,330 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:50:34,152 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-31 01:51:16,290 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 01:51:41,406 views User Umar requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+ERROR 2024-07-31 01:51:41,642 log Internal Server Error: /MosqueApp/nearby_mosques/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\options.py", line 681, in get_field
+    return self.fields_map[field_name]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'latitude'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 293, in get
+    for mosque in nearby_mosques:
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 400, in __iter__
+    self._fetch_all()
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 256, in get_select
+    select_mask = self.query.get_select_mask()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\query.py", line 877, in get_select_mask
+    return self._get_only_select_mask(opts, mask)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\sql\query.py", line 840, in _get_only_select_mask
+    field = opts.get_field(field_name)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\db\models\options.py", line 683, in get_field
+    raise FieldDoesNotExist(
+django.core.exceptions.FieldDoesNotExist: Mosque has no field named 'latitude'
+INFO 2024-07-31 01:53:02,557 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 01:53:03,356 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 01:53:06,607 views User Umar requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+INFO 2024-07-31 01:53:06,651 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 01:55:31,385 views User Umar requesting nearby mosques for lat: 28.032552, lon: -82.40719, distance: 1
+INFO 2024-07-31 01:55:31,422 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 01:56:15,161 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-31 01:56:15,200 views Nearby mosques fetched in 0.04 seconds
+WARNING 2024-07-31 01:57:54,791 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 01:58:26,130 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-31 01:58:26,170 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 01:59:59,722 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:00:00,594 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:00:04,626 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-31 02:00:04,672 views Nearby mosques fetched in 0.05 seconds
+INFO 2024-07-31 02:01:11,650 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-31 02:01:11,687 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:02:23,861 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 1
+INFO 2024-07-31 02:02:23,900 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:05:30,676 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:05:31,463 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:05:34,793 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:05:35,614 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:05:38,974 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:05:39,718 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:05:44,175 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:05:44,958 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-31 02:05:49,281 log Unauthorized: /MosqueApp/nearby_mosques/
+WARNING 2024-07-31 02:06:02,087 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 02:06:06,216 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 20.0
+INFO 2024-07-31 02:06:06,252 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:08:40,234 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:08:41,063 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:08:43,427 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:08:44,239 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:08:46,511 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:08:47,341 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:08:49,693 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:08:50,433 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:08:55,697 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 20.0
+INFO 2024-07-31 02:08:55,736 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:09:03,982 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 20.0
+INFO 2024-07-31 02:09:04,019 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:10:32,598 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:10:33,588 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:10:37,093 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 20.0 km
+INFO 2024-07-31 02:10:37,133 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:10:58,094 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:10:59,072 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-31 02:11:00,835 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 02:11:33,718 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 20.0 km
+INFO 2024-07-31 02:11:33,756 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:11:51,249 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:11:52,013 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:11:54,820 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:11:55,578 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:12:02,165 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:12:02,948 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:16:21,796 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:16:22,571 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:16:28,071 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:16:28,859 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-31 02:16:32,970 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 02:16:50,056 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 22.5 miles
+INFO 2024-07-31 02:16:50,102 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:20:12,009 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 22.5 miles
+INFO 2024-07-31 02:20:12,047 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:20:35,715 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:20:36,527 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:20:45,554 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 33.75 miles
+INFO 2024-07-31 02:20:45,650 views Nearby mosques fetched in 0.10 seconds
+INFO 2024-07-31 02:20:59,733 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:21:00,519 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:21:03,362 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:21:04,204 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:21:08,713 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:21:09,483 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:21:11,298 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:21:12,056 autoreload Watching for file changes with StatReloader
+WARNING 2024-07-31 02:22:09,949 log Unauthorized: /MosqueApp/nearby_mosques/
+INFO 2024-07-31 02:22:32,919 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 22.5 miles
+INFO 2024-07-31 02:22:32,957 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-07-31 02:23:00,701 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:01,551 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:23:05,042 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:05,827 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:23:16,846 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:17,697 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:23:24,935 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:25,684 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:23:27,902 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:28,765 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:23:33,200 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:23:34,075 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:24:44,806 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-07-31 02:24:45,782 autoreload Watching for file changes with StatReloader
+INFO 2024-07-31 02:26:56,616 views Starting user registration
+INFO 2024-07-31 02:26:56,655 views Validation successful for role: user
+INFO 2024-07-31 02:26:57,074 views Created user: mustaf7dfla in 0.42 seconds
+INFO 2024-07-31 02:26:57,075 views Total registration time: 0.46 seconds
+INFO 2024-08-03 19:25:43,286 autoreload Watching for file changes with StatReloader
+WARNING 2024-08-03 19:25:51,067 log Not Found: /favicon.ico
+INFO 2024-08-03 19:26:29,954 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:28:10,405 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 19:28:11,202 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:30:43,356 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 19:30:44,099 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:32:10,344 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 19:32:11,095 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:32:12,990 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 19:32:13,710 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:32:16,635 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 19:32:17,410 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:35:38,983 autoreload Watching for file changes with StatReloader
+WARNING 2024-08-03 19:36:47,887 log Not Found: /MosqueApp/MosqueApp/post/event/
+INFO 2024-08-03 19:36:58,753 views User Umar attempting to post event
+INFO 2024-08-03 19:36:58,936 views Event posted: {'mosque': 39, 'event_title': 'Community Gathering', 'event_date': '2024-08-15T18:00:00Z', 'location': 'Community Center', 'event_description': 'A gathering for the community to discuss future plans.', 'rsvp': True}
+INFO 2024-08-03 19:37:43,719 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 19:37:44,483 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 19:38:01,173 views User Umar attempting to post event
+WARNING 2024-08-03 19:38:01,249 log Bad Request: /MosqueApp/post/event/
+INFO 2024-08-03 19:38:10,730 views User Umar attempting to post event
+INFO 2024-08-03 19:38:10,918 views Event posted: {'mosque': 39, 'event_title': 'Community Gathering', 'event_date': '2024-08-15T18:00:00Z', 'location': 'Community Center', 'event_description': 'A gathering for the community to discuss future plans.'}
+INFO 2024-08-03 19:39:37,641 views User Umar attempting to post event
+INFO 2024-08-03 19:39:37,822 views Event posted: {'mosque': 39, 'event_title': 'Community Gathering', 'event_date': '2024-08-15T18:00:00Z', 'location': 'Community Center', 'event_description': 'A gathering for the community to discuss future plans.'}
+ERROR 2024-08-03 19:43:46,243 log Internal Server Error: /MosqueApp/events/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 459, in get
+    lat = float(request.query_params.get('lat'))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+WARNING 2024-08-03 19:44:13,375 log Not Found: /events
+ERROR 2024-08-03 19:44:20,141 log Internal Server Error: /MosqueApp/events/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 459, in get
+    lat = float(request.query_params.get('lat'))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+INFO 2024-08-03 19:45:30,985 views User Umar requesting nearby events for lat: 28.07019, lon: -82.42115
+INFO 2024-08-03 19:45:30,986 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 22.5 miles
+INFO 2024-08-03 19:45:31,030 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-08-03 19:45:31,069 views Nearby events fetched successfully
+WARNING 2024-08-03 19:48:39,675 log Unauthorized: /MosqueApp/events/
+WARNING 2024-08-03 19:48:54,703 log Unauthorized: /MosqueApp/events/
+ERROR 2024-08-03 19:49:04,300 log Internal Server Error: /MosqueApp/events/
+Traceback (most recent call last):
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\musta\Documents\MasjidApp\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py", line 459, in get
+    lat = float(request.query_params.get('lat'))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+INFO 2024-08-03 20:36:14,079 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 20:36:18,795 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:37:56,031 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:37:56,926 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:40:10,061 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:40:10,887 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:41:43,678 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 20:41:44,447 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:42:12,645 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:42:13,360 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:42:28,505 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:42:29,389 autoreload Watching for file changes with StatReloader
+WARNING 2024-08-03 20:42:39,705 log Unauthorized: /MosqueApp/events/
+INFO 2024-08-03 20:42:55,808 views User Umar requesting nearby events for lat: 28.07019, lon: -82.42115
+INFO 2024-08-03 20:42:55,809 views User Umar requesting nearby mosques for lat: 28.07019, lon: -82.42115, distance: 22.5 miles
+INFO 2024-08-03 20:42:55,847 views Nearby mosques fetched in 0.04 seconds
+INFO 2024-08-03 20:42:55,886 views Nearby events fetched successfully
+WARNING 2024-08-03 20:43:17,172 log Not Found: /MosqueApp/profile/mosque_id=39
+WARNING 2024-08-03 20:43:36,411 log Not Found: /MosqueApp/profile/mosque_name=Umar
+WARNING 2024-08-03 20:43:45,221 log Not Found: /MosqueApp/profile/mosquename=Umar
+INFO 2024-08-03 20:47:08,850 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:47:09,700 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:47:18,395 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:47:19,211 autoreload Watching for file changes with StatReloader
+WARNING 2024-08-03 20:48:24,540 log Unauthorized: /MosqueApp/profile/
+INFO 2024-08-03 20:50:31,935 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\models.py changed, reloading.
+INFO 2024-08-03 20:50:32,828 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:50:41,525 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\models.py changed, reloading.
+INFO 2024-08-03 20:50:42,348 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:51:06,200 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\serializers.py changed, reloading.
+INFO 2024-08-03 20:51:07,273 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:51:20,415 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\views.py changed, reloading.
+INFO 2024-08-03 20:51:21,242 autoreload Watching for file changes with StatReloader
+WARNING 2024-08-03 20:51:47,256 log Not Found: /MosqueApp/profile/mosque_id=39
+WARNING 2024-08-03 20:54:27,262 log Unauthorized: /MosqueApp/profile/
+INFO 2024-08-03 20:55:09,733 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:58:12,645 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\admin.py changed, reloading.
+INFO 2024-08-03 20:58:13,422 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:58:39,997 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\admin.py changed, reloading.
+INFO 2024-08-03 20:58:40,848 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:58:42,754 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\admin.py changed, reloading.
+INFO 2024-08-03 20:58:43,529 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:58:54,402 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\admin.py changed, reloading.
+INFO 2024-08-03 20:58:55,200 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:59:20,871 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 20:59:46,036 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\models.py changed, reloading.
+INFO 2024-08-03 20:59:46,754 autoreload Watching for file changes with StatReloader
+INFO 2024-08-03 21:00:06,291 autoreload C:\Users\musta\Documents\MasjidApp\MosqueApp\myapp\models.py changed, reloading.
+INFO 2024-08-03 21:00:07,024 autoreload Watching for file changes with StatReloader

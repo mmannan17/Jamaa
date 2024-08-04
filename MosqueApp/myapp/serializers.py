@@ -1,7 +1,13 @@
 from rest_framework import serializers
-from .models import CustomUser, Mosque, Post, Follow
+from .models import CustomUser, Mosque, Post, Follow, Events
 from .utils import get_grid
+from django import forms
 from .updatelocation import get_location
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Events
+        fields = ['id', 'mosque', 'event_title', 'event_date', 'location', 'event_description', 'rsvp']
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,10 +16,11 @@ class PostSerializer(serializers.ModelSerializer):
 
 class MosqueSerializer(serializers.ModelSerializer):
     posts = PostSerializer(many=True, read_only=True)
+    events = EventSerializer(many=True, read_only=True)  # Include events
 
     class Meta:
         model = Mosque
-        fields = ['mosque_id', 'mosquename', 'email', 'description', 'profile_pic', 'prayer_times', 'address', 'lat', 'lon', 'grid_cell_lat', 'grid_cell_lon', 'nonprofitform', 'posts']
+        fields = ['mosque_id', 'mosquename', 'email', 'description', 'profile_pic', 'prayer_times', 'address', 'lat', 'lon', 'grid_cell_lat', 'grid_cell_lon', 'nonprofitform', 'posts', 'events']
 
 class CustomUserSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False)
@@ -59,3 +66,8 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = '__all__'
+
+class PostEventForm(forms.ModelForm):
+    class Meta:
+        model = Events
+        fields = ['mosque', 'event_title', 'event_date', 'location', 'event_description', 'rsvp']

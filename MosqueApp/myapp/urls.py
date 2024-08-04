@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     RegisterUserView, UpdateMosqueView, FollowMosqueView,
     PostAnnouncementView, PostMediaView, PostEventView, LikePostView, NearbyMosquesView,MosqueVerificationView,GetUsersView, GetUserDetailView,
-    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView
+    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView
 )
 
 urlpatterns = [
@@ -22,6 +22,7 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user_profile'),
     path('profile/<int:user_id>/', UserProfileView.as_view(), name='user_profile_detail'),
     path('login/',UserLoginView.as_view(), name='login'),
+    path('events/', NearbyEventsView.as_view(), name='nearby_events'),
 
 
 ]
