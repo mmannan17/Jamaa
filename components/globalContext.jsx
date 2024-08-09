@@ -9,6 +9,7 @@ const Provider = ( { children } ) => {
     const [ isLoggedIn, setIsLoggedIn ] = useState(false)
     const [authToken, setAuthToken] = useState(null);
     const [user, setUser] = useState(null);
+    const [posts, setPosts] = useState([]);
 
     const login = async (username, password) => {
       try {
@@ -25,7 +26,6 @@ const Provider = ( { children } ) => {
           await AsyncStorage.setItem('authToken', data.access);
           setAuthToken(data.access);
           setUser(data.user); // Set user info
-          console.log(user)
           setIsLoggedIn(true);
         } else {
           throw new Error(data.detail || 'Login failed');
@@ -58,13 +58,15 @@ const Provider = ( { children } ) => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log('Posts:', data);
+        setPosts(data);
       } else {
         throw new Error(data.detail || 'Failed to fetch posts');
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
+
+
   };
 
     const globalContext = {
@@ -74,6 +76,7 @@ const Provider = ( { children } ) => {
         logout,
         getPosts,
         user,
+        posts,
     };
 
     return (

@@ -4,8 +4,14 @@ import {Link, Redirect, router} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import { images } from '../constants';
 import CustomButton from '../components/CustomButton';
+import { useContext } from 'react';
+import { Context } from '../components/globalContext';
 
 export default function LandingPage() {
+
+  const {isLoggedIn} = useContext(Context);
+  if(isLoggedIn) return <Redirect href='/home'/>
+
   return (
     <SafeAreaView className = 'bg-primary h-full'>
       <ScrollView contentContainerStyle = {{height: '100%'}}>

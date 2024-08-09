@@ -28,7 +28,7 @@ const [isSubmitting, setisSubmitting] = useState(false);
 
     try {
       await login(form.username, form.password);
-      router.push('/home')
+      router.replace('/home')
     } 
     
     catch (err) {
