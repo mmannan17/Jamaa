@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 
-const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, media_type}}) => {
+const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, media_type, profile_pic}}) => {
     const [play, setPlay] = useState(false)
     const date = new Date(timestamp);
     const formattedDate = date.toISOString().split('T')[0];
@@ -13,7 +13,7 @@ const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, medi
           <View className="w-[46px] h-[46px] rounded-lg border border-secondary flex justify-center items-center p-0.5">
             {/* Profile Pic */}
             <Image
-              source={{ uri: media_file }}
+              source={{ uri: profile_pic? media_file: 'https://ohsobserver.com/wp-content/uploads/2022/12/Guest-user.png' }}
               className="w-full h-full rounded-lg"
               resizeMode="cover"
             />
@@ -61,6 +61,11 @@ const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, medi
                             source={{ uri: media_file }}
                             className="w-full h-full rounded-xl mt-3"
                             resizeMode="cover"
+                        />
+                        <Image
+                            source={icons.play}
+                            className="w-12 h-12 absolute"
+                            resizeMode='contain'
                         />
                     </TouchableOpacity>
                 )
