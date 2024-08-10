@@ -43,7 +43,7 @@ const Profile = () => {
           </View>
           
           <InfoBox
-          title={user.username}
+          title={user ? user.username : 'User'}
           containterStyles="mt-5"
           textStyles="text-lg"
            />
