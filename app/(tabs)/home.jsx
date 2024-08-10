@@ -10,26 +10,27 @@ import { Context } from '../../components/globalContext'
 import PostCard from '../../components/postCard'
 
 const Home = () => {
-  const { getPosts, user, posts } = useContext(Context);
+  const { getPosts, user, allPosts, mosques, getMosques } = useContext(Context);
   const [refreshing, setRefreshing] = useState(false)
 
   const [isFetched, setIsFetched] = useState(false); // Add a flag to keep track of whether the initial fetch has been done
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await getPosts();
+    await getAllPosts();
     console.log("refreshed");
     setRefreshing(false);
   };
 
   useEffect(() => {
     getPosts();
+    getMosques();
   }, []);
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList 
-      data = {posts}
+      data = {allPosts}
       keyExtractor = {(item) => item.post_id.toString()}
       renderItem={({item}) => (
         <PostCard post={item}/>
