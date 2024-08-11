@@ -17,7 +17,8 @@ const Home = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await getAllPosts();
+    await getPosts();
+    await getMosques();
     console.log("refreshed");
     setRefreshing(false);
   };
