@@ -7,11 +7,9 @@ import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import * as DocumentPicker from 'expo-document-picker';
 import Dropdown from '../../components/DropDown';
-// import TestDropDown from '../../components/TestDropDown';
 
 const create = () => {
     const [uploading, setUploading] = useState(false)
-    const [postType, setPostType] = useState('')
     const [form, setForm] = useState({
         title: '',
         postType: '',
@@ -20,7 +18,9 @@ const create = () => {
         description: '',
     })
 
-    const submit = async () => {}
+    const submit = async () => {
+      console.log(form)
+    }
 
     const openPicker = async (selectType) => {
         const result = await DocumentPicker.getDocumentAsync({
@@ -47,15 +47,28 @@ const create = () => {
         title="Description / Caption (optional)"
         value={form.description}
         placeholder="Description"
-        handleChangeText={(e) => setForm({...form, title: e})}
+        handleChangeText={(e) => setForm({...form, description: e})}
         otherStyles="mt-5"
         />
 
-        <Dropdown
+        {/* <Dropdown
         title="Post Type"
         value={form.postType}
         // options={['Video', 'Image', 'Text']}
         // placeholder="Post Type"r
+        handleChangeText={(e) => setForm({...form, postType: e})}
+        otherStyles="mt-5"
+        /> */}
+
+        <Dropdown
+        title="Post Type"
+        value={form.postType}
+        options={[
+          { label: 'Image', value: 'image' },
+          { label: 'Video', value: 'video' },
+          { label: 'Announcement', value: 'announcement' },
+        ]}
+        placeholder="Placeholder"
         handleChangeText={(e) => setForm({...form, postType: e})}
         otherStyles="mt-5"
         />

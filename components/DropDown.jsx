@@ -1,72 +1,62 @@
-import { Image, View, Text, TextInput, TouchableOpacity } from 'react-native'
-import React, {useState} from 'react'
-import {icons} from '../constants'
+import React, { useState } from 'react';
+import { View, Text, Picker, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 
-const Dropdown = ({title, value, placeholder,
-handleChangeText, otherStyles, ...props}) => {
-    const [selectedValue, setSelectedValue] = useState(null);
+const Dropdown = ({title, value, placeholder, options, handleChangeText}) => {
+  const [selectedValue, setSelectedValue] = useState('');
 
-    const placeholderConfig = {
-        label: 'Select Type',
-        value: null,
-        color: '#7b7b8b',
-    };
-
-    const options = [
-        { label: 'Video', value: 'option1' },
-        { label: 'Image', value: 'option2' },
-        { label: 'Text', value: 'option3' },
-    ];
   return (
-    <View className={`space-y-2 ${otherStyles}`}>
-      <Text className ="test-base text-gray-100 font-pmedium text-lg ">{title}</Text>
-
-      <View className=" border-2 border-black-200 rounded-2xl focus:border-secondary items-center w-full h-16 px-4 bg-black-100 flex-row">
-        <RNPickerSelect className="flex-1 text-white font-psemibold text-base"
-        placeholder={placeholder}
+    <View className="space-y-2 mt-5">
+      <Text className="text-lg text-gray-100 font-pmedium">Post Type</Text>
+      <View style={styles.dropdownContainer} className="text-red-500">
+      <RNPickerSelect
+        placeholder={{
+          label: placeholder,
+          value: null,
+          color: '#7b7b8b',
+        }}
         items={options}
         onValueChange={(value) => {
-          setSelectedValue(value);
-          handleChangeText(value);
+            setSelectedValue(value);
+            handleChangeText(value);
         }}
         value={selectedValue}
         style={{
-          inputIOS: {
-            color: 'white',
-            fontSize: 16,
-            fontWeight: '600',
-            flex: 1,
-            height: '100%',
-            paddingHorizontal: 0,
-            paddingVertical: 10
-          },
-          inputAndroid: {
-            color: 'white',
-            fontSize: 16,
-            height: '100%',
-            fontWeight: '600',
-            flex: 1,
-            paddingHorizontal: 0,
-            paddingVertical: 10 
-          },
-          placeholder: {
-            color: '#7b7b8b',
-            fontSize: 'xl',
-            fontWeight: '600',
-          },
-          iconContainer: {
-            top: 10,
-            right: 12,
-          },
+          inputIOS: styles.pickerText,
+          inputAndroid: styles.pickerText,
         }}
         useNativeAndroidPickerStyle={false}
       />
-      {/* {<Text className="flex-1 text-white font-psemibold text-base">Selected: {selectedValue}</Text>} */}
-
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default Dropdown
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: 8,
+  },
+  label: {
+    fontSize: 18,
+    color: '#d1d1d1',
+    fontWeight: '500',
+  },
+  dropdownContainer: {
+    borderWidth: 2,
+    borderColor: '#232533',
+    borderRadius: 12,
+    height: 64,
+    paddingHorizontal: 16,
+    backgroundColor: '#1E1E2D',
+    justifyContent: 'center',
+  },
+  pickerText: {
+    color: '#CDCDE0',
+    font: 'psemibold',
+    fontSize: 16,
+    fontWeight: '600',
+    paddingHorizontal: 0,
+  },
+});
+
+export default Dropdown;

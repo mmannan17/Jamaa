@@ -48,7 +48,6 @@ const Provider = ( { children } ) => {
         router.replace("/sign-in")
     };
 
-
   const getPosts = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
