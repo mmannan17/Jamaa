@@ -117,6 +117,31 @@ const Provider = ( { children } ) => {
   };
 
 
+  const createPost = async (postData) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) throw new Error('No token found');
+      const response = await fetch(`${domain}/MosqueApp/posts/media`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setAllPosts((prevPosts) => [...prevPosts, data]);
+      } else {
+        throw new Error(data.detail || 'Failed to create post');
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+  };
+
+
     const globalContext = {
         isLoggedIn,
         setIsLoggedIn,
@@ -129,6 +154,7 @@ const Provider = ( { children } ) => {
         getMosques,
         getMosquePosts,
         mosquePosts,
+        createPost,
     };
 
     return (

@@ -1,35 +1,49 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormField from '../../components/FormField';
 import { Video, ResizeMode } from 'expo-av';
 import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
-import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import Dropdown from '../../components/DropDown';
 
 const create = () => {
     const [uploading, setUploading] = useState(false)
     const [form, setForm] = useState({
         title: '',
-        postType: '',
-        video: null,
-        picture: null,
-        description: '',
+        posttype: '',
+        media: null,
+        content: '',
     })
 
     const submit = async () => {
       console.log(form)
     }
 
-    const openPicker = async (selectType) => {
-        const result = await DocumentPicker.getDocumentAsync({
-          type:
-            selectType === "image"
-              ? ["image/png", "image/jpg"]
-              : ["video/mp4", "video/gif"],
-        });
-    }
+    const openPicker = async () => {
+      let result;
+  
+      // Launch the appropriate picker based on media type
+      result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All, // Allows both images and videos
+          allowsEditing: true,
+          quality: 1,
+      });
+  
+      // Handle the selected media
+      if (!result.canceled) {
+          setForm({
+              ...form,
+              media: result.assets[0], // Save the selected media to form.media
+          });
+        }
+      // } else {
+      //     setTimeout(() => {
+      //         Alert.alert("No media selected", JSON.stringify(result, null, 2));
+      //     }, 100);
+      // }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -53,16 +67,7 @@ const create = () => {
 
         {/* <Dropdown
         title="Post Type"
-        value={form.postType}
-        // options={['Video', 'Image', 'Text']}
-        // placeholder="Post Type"r
-        handleChangeText={(e) => setForm({...form, postType: e})}
-        otherStyles="mt-5"
-        /> */}
-
-        <Dropdown
-        title="Post Type"
-        value={form.postType}
+        value={form.posttype}
         options={[
           { label: 'Image', value: 'image' },
           { label: 'Video', value: 'video' },
@@ -71,30 +76,39 @@ const create = () => {
         placeholder="Placeholder"
         handleChangeText={(e) => setForm({...form, postType: e})}
         otherStyles="mt-5"
-        />
+        /> */}
 
         <View className="mt-7 space-y-2">
-            <Text className="text-base text-gray-100 font-pmedium">Upload Video</Text>
-            <TouchableOpacity onPress={() => openPicker('video')}>
-                {form.video ? (
-                    <Video 
-                    source={form.video}
-                    className="w-full h-64 roundeed-2xl"
-                    useNativeControls
-                    resizeMode={ResizeMode.COVER}
-                    isLooping
-                     />
-                ) : (
-                    <View className="w-full h-40  px-4 bg-black-100 rounded-2xl justify-center items-center">
-                        <View className="w-14 h-14 border border-dashed border-secondary-100 justify-center items-center">
-                            <Image 
-                            source={icons.upload} 
-                            className="w-1/2 h-1/2"
-                            ResizeMode="contain"/>
-                        </View>
-                    </View>
-                )}
-            </TouchableOpacity>
+            <Text className="text-base text-gray-100 font-pmedium">Upload Media (optional)</Text>
+            <TouchableOpacity onPress={() => openPicker()}>
+    {form.media ? (
+        form.media.type.startsWith('image') ? (
+            <Image 
+                source={{ uri: form.media.uri }} 
+                className="w-full h-64 rounded-2xl" 
+                resizeMode="contain" 
+            />
+        ) : (
+            <Video 
+                source={{ uri: form.media.uri }}
+                className="w-full h-64 rounded-2xl"
+                useNativeControls
+                resizeMode="cover"
+                isLooping
+            />
+        )
+    ) : (
+        <View className="w-full h-40 px-4 bg-black-100 rounded-2xl justify-center items-center">
+            <View className="w-14 h-14 border border-dashed border-secondary-100 justify-center items-center">
+                <Image 
+                    source={icons.upload} 
+                    className="w-1/2 h-1/2"
+                    resizeMode="contain"
+                />
+            </View>
+        </View>
+    )}
+</TouchableOpacity>
         </View>
         {/* <View>
             
