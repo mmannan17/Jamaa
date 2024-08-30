@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef, createContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
 import { router } from 'expo-router';
 
 const Context = createContext()
@@ -13,6 +14,16 @@ const Provider = ( { children } ) => {
     const [allPosts, setAllPosts] = useState([]);
     const [mosques, setMosques] = useState([])
     const [mosquePosts, setMosquePosts] = useState([])
+    const [location, setLocation] = useState({ latitude: null, longitude: null });
+    const [isLocationShared, setIsLocationShared] = useState(false);
+
+
+
+    useEffect(() => {
+      if (user && user.username) {
+        getLocationForUser(user.username);
+      }
+    }, [user]);
 
     const login = async (username, password) => {
       try {
@@ -67,6 +78,41 @@ const Provider = ( { children } ) => {
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
+    }
+  };
+
+  const getLocationForUser = async (username) => {
+    try {
+      const locationSharedKey = `${username}_locationShared`;
+      const locationShared = await AsyncStorage.getItem(locationSharedKey);
+      
+      if (locationShared === 'true') {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          setLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+          setIsLocationShared(true);
+        }
+      } else if (locationShared === null) {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          setLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+          await AsyncStorage.setItem(locationSharedKey, 'true');
+          setIsLocationShared(true);
+        } else {
+          await AsyncStorage.setItem(locationSharedKey, 'false');
+          setIsLocationShared(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
     }
   };
 
@@ -155,6 +201,8 @@ const Provider = ( { children } ) => {
         getMosquePosts,
         mosquePosts,
         createPost,
+        location, // Provide the location data
+        getLocationForUser, // Provide the location fetch function
     };
 
     return (

@@ -1,22 +1,26 @@
 import { View, Text, ScrollView, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
 import { Link, useNavigation } from 'expo-router';
-import { Picker } from '@react-native-picker/picker';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerUser } from '../../apiRequests';
 
 const SignUp = () => {
   const [form, setForm] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    latitude: null,
+    longitude: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigation = useNavigation(); // Use the navigation hook
+
 
 
   const submit = async () => {
@@ -26,9 +30,9 @@ const SignUp = () => {
         username: form.username,
         email: form.email,
         password: form.password,
-        role:"user",
-        latitude: 12.0,
-        longitude: 12.0
+        role: "user",
+        latitude: form.latitude || 0.0,  // Fallback in case location is not shared
+        longitude: form.longitude || 0.0,
       };
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);
