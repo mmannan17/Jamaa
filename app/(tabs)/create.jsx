@@ -11,7 +11,7 @@ import { Context } from '../../components/globalContext';
 
 const create = () => {
     const [uploading, setUploading] = useState(false)
-    const { createPost } = useContext(Context);
+    const { createPost, user } = useContext(Context);
 
     const [form, setForm] = useState({
         title: '',
@@ -23,17 +23,18 @@ const create = () => {
         setUploading(true);
         try {
             const postData = {
-                mosque: 39,
+                mosque: user.mosque.mosque_id,
                 posttype: form.title, 
                 content: form.content,
                 media_file: form.media ? form.media : null,
             };
 
-            console.log('Submitting post data:', postData);
+            console.log('Submitting post data...');
             const result = await createPost(postData);
-            console.log('Post created successfully:', result);
+            console.log('Post created successfully');
             // Clear form or navigate away
             setForm({ title: '', media: null, content: '' });
+            Alert.alert('Success', 'Post created successfully!');
         } catch (error) {
             console.error('Error creating post:', error);
             Alert.alert('Error', 'Failed to create post. Please try again.');
@@ -46,7 +47,7 @@ const create = () => {
   
       const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All, 
-          allowsEditing: true,
+          allowsEditing: false,
           quality: 1,
       });
   
@@ -77,19 +78,6 @@ const create = () => {
         handleChangeText={(e) => setForm({...form, content: e})}
         otherStyles="mt-5"
         />
-
-        {/* <Dropdown
-        title="Post Type"
-        value={form.posttype}
-        options={[
-          { label: 'Image', value: 'image' },
-          { label: 'Video', value: 'video' },
-          { label: 'Announcement', value: 'announcement' },
-        ]}
-        placeholder="Placeholder"
-        handleChangeText={(e) => setForm({...form, postType: e})}
-        otherStyles="mt-5"
-        /> */}
 
         <View className="mt-7 space-y-2">
             <Text className="text-base text-gray-100 font-pmedium">Upload Media (optional)</Text>

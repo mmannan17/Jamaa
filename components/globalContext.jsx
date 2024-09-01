@@ -129,9 +129,12 @@ const Provider = ( { children } ) => {
           setRefreshToken(refreshToken);
           setUser(JSON.parse(userData));
           setIsLoggedIn(true);
+          return true;
         }
+        return false;
       } catch (error) {
         console.error('Error checking existing token:', error);
+        return false;
       }
     };
 
@@ -213,8 +216,6 @@ const Provider = ( { children } ) => {
           name: fileName,
         });
       }
-
-      console.log('Sending formData:', formData);
 
       const response = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
         method: 'POST',
