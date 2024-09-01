@@ -42,7 +42,7 @@ const PostCard = React.memo(({post: {posttype, content, media_file, timestamp, m
         </View>
     </View>
     {content && (
-      <Text className="text-white font-pmedium px-1 mt-2 mb-4" numberOfLines={10}>{content}</Text>
+      <Text className="text-white font-pmedium px-1 mt-3 mb-3" numberOfLines={10}>{content}</Text>
     )}
 
     {media_file && (
