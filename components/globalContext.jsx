@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef, createContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { Alert } from 'react-native';
 
 const Context = createContext()
 
@@ -9,6 +10,7 @@ const Provider = ( { children } ) => {
     const [ domain ] = useState("http://masjidapp-dev.us-east-1.elasticbeanstalk.com/")
     const [ isLoggedIn, setIsLoggedIn ] = useState(false)
     const [authToken, setAuthToken] = useState(null);
+    const [refreshToken, setRefreshToken] = useState(null);
     const [user, setUser] = useState(null);
     const [allPosts, setAllPosts] = useState([]);
     const [mosques, setMosques] = useState([])
@@ -23,12 +25,14 @@ const Provider = ( { children } ) => {
           },
           body: JSON.stringify({ username, password }),
         });
-  
+
         const data = await response.json();
         if (response.ok) {
           await AsyncStorage.setItem('authToken', data.access);
+          await AsyncStorage.setItem('refreshToken', data.refresh);
           setAuthToken(data.access);
-          setUser(data.user); // Set user info
+          setRefreshToken(data.refresh);
+          setUser(data.user); 
           setIsLoggedIn(true);
         } else {
           throw new Error(data.detail || 'Login failed');
@@ -42,10 +46,76 @@ const Provider = ( { children } ) => {
 
     const logout = async () => {
         await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('refreshToken');
         setAuthToken(null);
+        setRefreshToken(null);
         setIsLoggedIn(false);
-        setUser(null)
+        setUser(null);
         router.replace("/sign-in")
+    };
+
+    const refreshAccessToken = async () => {
+      try {
+        const currentRefreshToken = await AsyncStorage.getItem('refreshToken');
+        if (!currentRefreshToken) throw new Error('No refresh token found');
+    
+        const response = await fetch(`${domain}/api/token/refresh/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refresh: currentRefreshToken }),
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+          await AsyncStorage.setItem('authToken', data.access);
+          setAuthToken(data.access);
+          return data.access;
+        } else {
+          throw new Error(data.detail || 'Token refresh failed');
+        }
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+        logout(); // Force logout if refresh fails
+        throw error;
+      }
+    };
+
+    const authenticatedFetch = async (url, options = {}) => {
+      let token = await AsyncStorage.getItem('authToken');
+    
+      if (!token) {
+        throw new Error('No token found');
+      }
+    
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+    
+        if (response.status === 401) {
+          // Token might be expired, try to refresh
+          token = await refreshAccessToken();
+          // Retry the request with the new token
+          return fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+        }
+    
+        return response;
+      } catch (error) {
+        console.error('Error in authenticatedFetch:', error);
+        throw error;
+      }
     };
 
   const getPosts = async () => {
@@ -61,7 +131,9 @@ const Provider = ( { children } ) => {
       });
       const data = await response.json();
       if (response.ok) {
-        setAllPosts(data);
+        // Sort the posts by creation date in descending order
+        const sortedPosts = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setAllPosts(sortedPosts);
       } else {
         throw new Error(data.detail || 'Failed to fetch posts');
       }
@@ -73,14 +145,8 @@ const Provider = ( { children } ) => {
 
   const getMosques = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) throw new Error('No token found');
-
-      const response = await fetch(`${domain}/MosqueApp/mosques/`, {
+      const response = await authenticatedFetch(`${domain}/MosqueApp/mosques/`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
       const data = await response.json();
       if (response.ok) {
@@ -96,52 +162,68 @@ const Provider = ( { children } ) => {
 
   const getMosquePosts = async (mosqueId) => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) throw new Error('No token found');
-
-      const response = await fetch(`${domain}/MosqueApp/posts/?mosque=${mosqueId}`, {
+      const response = await authenticatedFetch(`${domain}/MosqueApp/posts/?mosque=${mosqueId}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
       const data = await response.json();
       if (response.ok) {
         setMosquePosts(data);
       } else {
-        throw new Error(data.detail || 'Failed to fetch posts');
+        throw new Error(data.detail || 'Failed to fetch mosque posts');
       }
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error('Error fetching mosque posts:', error);
     }
   };
 
 
-  const createPost = async (postData) => {
+
+  const createPost = async (data) => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) throw new Error('No token found');
-      const response = await fetch(`${domain}/MosqueApp/posts/media`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAllPosts((prevPosts) => [...prevPosts, data]);
-      } else {
-        throw new Error(data.detail || 'Failed to create post');
+      const formData = new FormData();
+      formData.append('mosque', data.mosque);
+      formData.append('content', data.content);
+      formData.append('posttype', data.posttype);
+
+      if (data.media_file) {
+        const fileUri = data.media_file.uri;
+        const fileType = data.media_file.mimeType || 'image/jpeg';
+        const fileName = data.media_file.fileName || fileUri.split('/').pop() || 'image.jpg';
+
+        formData.append('media_file', {
+          uri: fileUri,
+          type: fileType,
+          name: fileName,
+        });
       }
+
+      console.log('Sending formData:', formData);
+
+      const response = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response body:', responseText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error, status: ${response.status}`);
+      }
+
+      const result = JSON.parse(responseText);
+      setAllPosts((prevPosts) => [result, ...prevPosts]);
+      return result;
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('Post creation failed:', error.message || error);
       throw error;
     }
   };
-
-
+  
     const globalContext = {
         isLoggedIn,
         setIsLoggedIn,

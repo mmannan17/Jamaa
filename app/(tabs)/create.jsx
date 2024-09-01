@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormField from '../../components/FormField';
 import { Video, ResizeMode } from 'expo-av';
@@ -7,42 +7,55 @@ import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import * as ImagePicker from 'expo-image-picker';
 import Dropdown from '../../components/DropDown';
+import { Context } from '../../components/globalContext';
 
 const create = () => {
     const [uploading, setUploading] = useState(false)
+    const { createPost } = useContext(Context);
+
     const [form, setForm] = useState({
         title: '',
-        posttype: '',
         media: null,
         content: '',
     })
 
-    const submit = async () => {
-      console.log(form)
-    }
+    const handleSubmit = async () => {
+        setUploading(true);
+        try {
+            const postData = {
+                mosque: 39,
+                posttype: form.title, 
+                content: form.content,
+                media_file: form.media ? form.media : null,
+            };
+
+            console.log('Submitting post data:', postData);
+            const result = await createPost(postData);
+            console.log('Post created successfully:', result);
+            // Clear form or navigate away
+            setForm({ title: '', media: null, content: '' });
+        } catch (error) {
+            console.error('Error creating post:', error);
+            Alert.alert('Error', 'Failed to create post. Please try again.');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const openPicker = async () => {
-      let result;
   
-      // Launch the appropriate picker based on media type
-      result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All, // Allows both images and videos
+      const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All, 
           allowsEditing: true,
           quality: 1,
       });
   
-      // Handle the selected media
       if (!result.canceled) {
           setForm({
               ...form,
               media: result.assets[0], // Save the selected media to form.media
           });
         }
-      // } else {
-      //     setTimeout(() => {
-      //         Alert.alert("No media selected", JSON.stringify(result, null, 2));
-      //     }, 100);
-      // }
   };
 
   return (
@@ -59,9 +72,9 @@ const create = () => {
 
         <FormField 
         title="Description / Caption (optional)"
-        value={form.description}
+        value={form.content}
         placeholder="Description"
-        handleChangeText={(e) => setForm({...form, description: e})}
+        handleChangeText={(e) => setForm({...form, content: e})}
         otherStyles="mt-5"
         />
 
@@ -116,7 +129,7 @@ const create = () => {
 
         <CustomButton
         title="Submit & Share"
-        handlePress={submit}
+        handlePress={handleSubmit}
         containerStyles="mt-7"
         isLoading={uploading}
         />
