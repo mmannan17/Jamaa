@@ -1,10 +1,14 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
-const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, media_type, profile_pic}}) => {
+const PostCard = React.memo(({post: {posttype, content, media_file, timestamp, mosque, media_type, profile_pic}}) => {
     const [play, setPlay] = useState(false)
     const date = new Date(timestamp);
     const formattedDate = date.toISOString().split('T')[0];
+
+    const togglePlay = useCallback(() => {
+        setPlay(prev => !prev);
+    }, []);
 
   return (
     <View className="flex-col item-center px-4 mb-8">
@@ -86,6 +90,6 @@ const PostCard = ({post: {posttype, content, media_file, timestamp, mosque, medi
     )}
   </View>
 )
-}
+})
 
 export default PostCard;

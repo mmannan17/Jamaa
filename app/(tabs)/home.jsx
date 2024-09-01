@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Image, RefreshControl } from 'react-native'
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from '../../constants'
 import SearchInput from '../../components/SearchInput'
@@ -10,8 +10,8 @@ import PostCard from '../../components/postCard'
 const Home = () => {
   const { getPosts, user, allPosts, mosques, getMosques } = useContext(Context);
   const [refreshing, setRefreshing] = useState(false)
-
   const [isFetched, setIsFetched] = useState(false); // Add a flag to keep track of whether the initial fetch has been done
+  const MemoizedPostCard = React.memo(PostCard);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -32,7 +32,7 @@ const Home = () => {
       data = {allPosts}
       keyExtractor = {(item) => item.post_id.toString()}
       renderItem={({item}) => (
-        <PostCard post={item}/>
+        <MemoizedPostCard post={item}/>
       )}
       ListHeaderComponent={()=>(
         <View className="flex mt-6 px-4 space-y-2">
@@ -74,6 +74,10 @@ const Home = () => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
+      getItemLayout={(data, index) => (
+        {length: 200, offset: 200 * index, index}
+      )}
+      windowSize={5}
       />
     </SafeAreaView>
   )

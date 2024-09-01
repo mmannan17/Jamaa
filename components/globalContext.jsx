@@ -30,6 +30,7 @@ const Provider = ( { children } ) => {
         if (response.ok) {
           await AsyncStorage.setItem('authToken', data.access);
           await AsyncStorage.setItem('refreshToken', data.refresh);
+          await AsyncStorage.setItem('userData', JSON.stringify(data.user));
           setAuthToken(data.access);
           setRefreshToken(data.refresh);
           setUser(data.user); 
@@ -45,8 +46,7 @@ const Provider = ( { children } ) => {
   
 
     const logout = async () => {
-        await AsyncStorage.removeItem('authToken');
-        await AsyncStorage.removeItem('refreshToken');
+        await AsyncStorage.multiRemove(['authToken', 'refreshToken', 'userData']);
         setAuthToken(null);
         setRefreshToken(null);
         setIsLoggedIn(false);
@@ -115,6 +115,23 @@ const Provider = ( { children } ) => {
       } catch (error) {
         console.error('Error in authenticatedFetch:', error);
         throw error;
+      }
+    };
+
+    const checkExistingToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        const userData = await AsyncStorage.getItem('userData');
+        
+        if (token && refreshToken && userData) {
+          setAuthToken(token);
+          setRefreshToken(refreshToken);
+          setUser(JSON.parse(userData));
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error('Error checking existing token:', error);
       }
     };
 
@@ -237,6 +254,7 @@ const Provider = ( { children } ) => {
         getMosquePosts,
         mosquePosts,
         createPost,
+        checkExistingToken,
     };
 
     return (
