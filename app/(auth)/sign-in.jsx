@@ -28,11 +28,9 @@ const [isSubmitting, setisSubmitting] = useState(false);
 
     try {
       await login(form.username, form.password);
-      router.replace('/home')
-    } 
-    
-    catch (err) {
-      setError(err.message);
+      router.replace('/home');
+    } catch (err) {
+      setError("Invalid username or password. Please try again.");
     }
     setisSubmitting(false);
   };
@@ -45,6 +43,10 @@ const [isSubmitting, setisSubmitting] = useState(false);
         resizeMode='contain' className="w-[115px] h-[35px]"/>
         <Text className = "text-2xl text-white mt-10 font-psemibold">Log in to Masjidy</Text>
         
+        {error && (
+          <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>
+        )}
+
         <FormField 
         title= "Username"
         value={form.username}
