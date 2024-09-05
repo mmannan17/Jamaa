@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Image } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
@@ -8,6 +8,8 @@ import { Link, useNavigation } from 'expo-router';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerUser } from '../../apiRequests';
+import { Context } from '../../components/globalContext'
+
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -17,7 +19,7 @@ const SignUp = () => {
     latitude: null,
     longitude: null,
   });
-
+  const { getLocationForUser } = useContext(Context);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigation = useNavigation(); // Use the navigation hook
 
@@ -26,13 +28,20 @@ const SignUp = () => {
   const submit = async () => {
     setIsSubmitting(true);
     try {
+      console.log(form.username)
+      const location = await getLocationForUser(form.username)
+      if (!location) {
+        console.log('Location Error', 'Could not fetch location or permission denied.');
+        setIsSubmitting(false);
+        return;
+      }
       const userData = {
         username: form.username,
         email: form.email,
         password: form.password,
         role: "user",
-        latitude: form.latitude || 0.0,  // Fallback in case location is not shared
-        longitude: form.longitude || 0.0,
+        latitude: location.latitude || 0.0,  // Fallback in case location is not shared
+        longitude: location.longitude || 0.0,
       };
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);

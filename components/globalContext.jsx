@@ -177,7 +177,35 @@ const Provider = ( { children } ) => {
     try {
       const locationSharedKey = `${username}_locationShared`;
       const locationShared = await AsyncStorage.getItem(locationSharedKey);
-      
+  
+      // If no prior location sharing history, always request permissions
+      if (locationShared === null || locationShared === 'false') {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        console.log(status)
+  
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          await AsyncStorage.setItem(locationSharedKey, 'true'); // Store permission
+          setLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+          setIsLocationShared(true);
+  
+          return {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          };
+        } else {
+          // Permission denied, store false and don't set location
+          await AsyncStorage.setItem(locationSharedKey, 'false');
+          setIsLocationShared(false);
+          console.log('Location permission denied.');
+          return null;
+        }
+      }
+  
+      // If the user has already shared their location before
       if (locationShared === 'true') {
         const { status } = await Location.getForegroundPermissionsAsync();
         if (status === 'granted') {
@@ -187,26 +215,24 @@ const Provider = ( { children } ) => {
             longitude: location.coords.longitude,
           });
           setIsLocationShared(true);
-        }
-      } else if (locationShared === null) {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({});
-          setLocation({
+  
+          return {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-          });
-          await AsyncStorage.setItem(locationSharedKey, 'true');
-          setIsLocationShared(true);
+          };
         } else {
-          await AsyncStorage.setItem(locationSharedKey, 'false');
-          setIsLocationShared(false);
+          console.log('Location permission was not granted.');
+          return null;
         }
       }
+  
+      return null; // Default return if none of the conditions are met
     } catch (error) {
       console.error('Error getting location:', error);
+      return null;
     }
   };
+  
 
 
   const getMosques = async () => {
