@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, Linking, Platform, Alert } from 'react-native'
+import { View, Text, FlatList, Image, TouchableOpacity, Linking, Platform, Alert, Modal } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Context } from '../../components/globalContext';
 import EmptyState from '../../components/EmptyState';
-import PostCard from '../../components/postCard';
+import ProfilePostCard from '../../components/ProfilePostCard';
 import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 
 const Profile = () => {
-  const { user, mosquePosts, getMosquePosts, logout, profile_pic } = useContext(Context);
+  const { user, mosquePosts, getMosquePosts, logout, profile_pic, deletePost } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState(null);
 
   useEffect(() => {
     const fetchMosquePosts = async () => {
@@ -41,6 +43,24 @@ const Profile = () => {
     });
   };
 
+  const openMenu = (postId) => {
+    setSelectedPostId(postId);
+    setModalVisible(true);
+  };
+
+  const handleDeletePost = async () => {
+    if (selectedPostId) {
+      const success = await deletePost(selectedPostId);
+      if (success) {
+        // Refresh the posts
+        if (user && user.mosque && user.mosque.mosque_id) {
+          await getMosquePosts(user.mosque.mosque_id);
+        }
+      }
+    }
+    setModalVisible(false);
+  };
+
   if (isLoading) {
     return <View className="flex-1 justify-center items-center bg-primary"><Text className="font-psemibold text-white text-2xl">Loading...</Text></View>;
   }
@@ -54,7 +74,19 @@ const Profile = () => {
         data={mosquePosts}
         keyExtractor={(item) => item.post_id.toString()}
         renderItem={({item}) => (
-          <PostCard post={item}/>
+          <View>
+            <ProfilePostCard post={item}/>
+            <TouchableOpacity 
+              onPress={() => openMenu(item.post_id)}
+              className="absolute top-2 right-2 p-2"
+            >
+              <Image
+                source={icons.menu}
+                className="w-6 h-6"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
         )}
         ListHeaderComponent={() => (
           <View className="w-full items-center mt-6 mb-12 px-4">
@@ -104,6 +136,31 @@ const Profile = () => {
           />
         )}
       />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="bg-primary p-5 rounded-lg w-4/5">
+            <Text className="text-white text-lg mb-4">Delete this post?</Text>
+            <View className="flex-row justify-between">
+              <CustomButton
+                title="Cancel"
+                handlePress={() => setModalVisible(false)}
+                containerStyles="flex-1 mr-2"
+              />
+              <CustomButton
+                title="Delete"
+                handlePress={handleDeletePost}
+                containerStyles="flex-1 ml-2 bg-red-500"
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
