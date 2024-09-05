@@ -1,8 +1,9 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native'
 import React, { useContext, useMemo } from 'react'
-import { useLocalSearchParams, router } from 'expo-router'
+import { useLocalSearchParams, router, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Context } from '../../components/globalContext'
+import { icons } from '../../constants';
 
 const Search = () => {
   const { query } = useLocalSearchParams()
@@ -29,6 +30,16 @@ const Search = () => {
 
   return (
     <SafeAreaView className="bg-primary h-full">
+      <TouchableOpacity 
+        onPress={() => router.back()} 
+        className="top-4 left-4 z-10"
+      >
+        <Image
+          source={icons.leftArrow}
+          className="w-6 h-6"
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
       <Text className="text-3xl text-white font-psemibold mt-5 p-4">Search Results for "{decodeURIComponent(query)}"</Text>
       <FlatList
         data={searchResults}
