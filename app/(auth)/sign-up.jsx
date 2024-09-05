@@ -21,8 +21,8 @@ const SignUp = () => {
   });
   const { getLocationForUser } = useContext(Context);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigation = useNavigation(); // Use the navigation hook
-
+  const [error, setError] = useState(null);
+  const navigation = useNavigation();
 
 
   const submit = async () => {
@@ -45,12 +45,10 @@ const SignUp = () => {
       };
       const response = await registerUser(userData);
       console.log('User registered successfully:', response);
-      // Optionally, redirect to another page or show a success message
-      navigation.navigate('sign-in'); // Make sure 'sign-in' matches your route name
-
+      navigation.navigate('sign-in');
     } catch (error) {
       console.error('Error registering user:', error);
-      // Optionally, show an error message to the user
+      setError("An error occurred during registration. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -62,6 +60,10 @@ const SignUp = () => {
         <View className="w-full justify-center min-h-[75vh] px-4 my-6">
           <Image source={images.logo} resizeMode='contain' className="w-[115px] h-[35px]" />
           <Text className="text-2xl text-white mt-10 font-psemibold">Sign Up to the Masjid App</Text>
+
+          {error && (
+            <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>
+          )}
 
           <FormField
             title="Username"

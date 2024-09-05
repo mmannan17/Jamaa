@@ -314,6 +314,32 @@ const Provider = ( { children } ) => {
     }
   };
   
+  const deletePost = async (postId) => {
+    try {
+      const response = await authenticatedFetch(`${domain}/MosqueApp/posts/${postId}/delete/`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to delete post');
+      }
+
+      // Remove the deleted post from allPosts and mosquePosts
+      setAllPosts(prevPosts => prevPosts.filter(post => post.post_id !== postId));
+      setMosquePosts(prevPosts => prevPosts.filter(post => post.post_id !== postId));
+
+      // Optionally, you can show a success message here
+      Alert.alert('Success', 'Post deleted successfully');
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      Alert.alert('Error', 'Failed to delete post. Please try again.');
+      return false;
+    }
+  };
+
     const globalContext = {
         isLoggedIn,
         setIsLoggedIn,
@@ -328,6 +354,7 @@ const Provider = ( { children } ) => {
         mosquePosts,
         createPost,
         checkExistingToken,
+        deletePost,
         location, // Provide the location data
         getLocationForUser, // Provide the location fetch function
     };

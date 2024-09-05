@@ -17,29 +17,33 @@ const SignUp = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigation = useNavigation(); // Use the navigation hook
-
+  const [error, setError] = useState(null);
+  const navigation = useNavigation();
 
   const submit = async () => {
     setIsSubmitting(true);
+    setError(null);
+
+    if (!form.username || !form.email || !form.password || !form.address) {
+      setError("Please fill in all fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const userData = {
         username: form.username,
         email: form.email,
         password: form.password,
         address: form.address,
-        role:"mosque"
+        role: "mosque"
       };
       const response = await registerUser(userData);
-      navigation.navigate('sign-in'); // Make sure 'sign-in' matches your route name
-
-
+      navigation.navigate('sign-in');
       console.log('User registered successfully:', response);
-      // Optionally, redirect to another page or show a success message
     } catch (error) {
       console.error('Error registering user:', error);
-
-      // Optionally, show an error message to the user
+      setError("An error occurred during registration. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,6 +55,10 @@ const SignUp = () => {
         <View className="w-full justify-center min-h-[75vh] px-4 my-6">
           <Image source={images.logo} resizeMode='contain' className="w-[115px] h-[35px]" />
           <Text className="text-2xl text-white mt-10 font-psemibold">Register Your Masjid</Text>
+
+          {error && (
+            <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>
+          )}
 
           <FormField
             title="Mosque Name"
@@ -78,12 +86,12 @@ const SignUp = () => {
             placeholder="Enter Password"
           />
 
-        <FormField
+          <FormField
             title="Mosque Address"
             value={form.address}
             handleChangeText={(e) => setForm({ ...form, address: e })}
             otherStyles="mt-7"
-            placeholder= "Enter Address"
+            placeholder="Enter Address"
           />
 
           <CustomButton

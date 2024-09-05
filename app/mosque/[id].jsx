@@ -7,8 +7,10 @@ import EmptyState from '../../components/EmptyState';
 import PostCard from '../../components/postCard';
 import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
+import { useRouter } from 'expo-router';
 
 const MosqueProfile = () => {
+  const router = useRouter();
   const { id } = useLocalSearchParams();
   const { mosques, getMosquePosts } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +59,16 @@ const MosqueProfile = () => {
 
   return (
     <SafeAreaView className="bg-primary h-full">
+      <TouchableOpacity 
+        onPress={() => router.back()} 
+        className="top-4 left-4 z-10"
+      >
+        <Image
+          source={icons.leftArrow}
+          className="w-6 h-6"
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
       <FlatList
         data={mosque.mosque ? mosque.mosque.posts : []}
         keyExtractor={(item) => item.post_id.toString()}
