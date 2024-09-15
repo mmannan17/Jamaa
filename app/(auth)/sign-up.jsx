@@ -19,7 +19,7 @@ const SignUp = () => {
     latitude: null,
     longitude: null,
   });
-  const { getLocationForUser } = useContext(Context);
+  const { getUserLocation } = useContext(Context);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -29,7 +29,7 @@ const SignUp = () => {
     setIsSubmitting(true);
     try {
       console.log(form.username)
-      const location = await getLocationForUser(form.username)
+      const location = await getUserLocation(form.username)
       if (!location) {
         console.log('Location Error', 'Could not fetch location or permission denied.');
         setIsSubmitting(false);

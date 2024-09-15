@@ -8,7 +8,7 @@ import { Context } from '../../components/globalContext'
 import PostCard from '../../components/postCard'
 
 const Home = () => {
-  const { getPosts, user, allPosts, mosques, getMosques } = useContext(Context);
+  const { getPosts, user, allPosts, mosques, getMosques, getNearbyMosques } = useContext(Context);
   const [refreshing, setRefreshing] = useState(false)
   const [isFetched, setIsFetched] = useState(false); // Add a flag to keep track of whether the initial fetch has been done
   const MemoizedPostCard = React.memo(PostCard);
@@ -24,6 +24,7 @@ const Home = () => {
   useEffect(() => {
     getPosts();
     getMosques();
+    getNearbyMosques();
   }, []);
 
   return (

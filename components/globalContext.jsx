@@ -23,7 +23,7 @@ const Provider = ( { children } ) => {
 
     useEffect(() => {
       if (user && user.username) {
-        getLocationForUser(user.username);
+        getUserLocation(user.username);
       }
     }, [user]);
 
@@ -173,7 +173,7 @@ const Provider = ( { children } ) => {
     }
   };
 
-  const getLocationForUser = async (username) => {
+  const getUserLocation = async (username) => {
     try {
       const locationSharedKey = `${username}_locationShared`;
       const locationShared = await AsyncStorage.getItem(locationSharedKey);
@@ -232,8 +232,31 @@ const Provider = ( { children } ) => {
       return null;
     }
   };
-  
 
+  const getNearbyMosques = async () => {
+    try {
+      const location = await getUserLocation();
+      if (!location || !location.latitude || !location.longitude) {
+        throw new Error('Unable to get user location');
+      }
+
+      const response = await authenticatedFetch(`${domain}/MosqueApp/nearby_mosques/?lon=${location.longitude}&lat=${location.latitude}`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to fetch nearby mosques');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching nearby mosques:', error);
+      Alert.alert('Error', 'Failed to fetch nearby mosques. Please try again.');
+      return [];
+    }
+  };
 
   const getMosques = async () => {
     try {
@@ -355,8 +378,9 @@ const Provider = ( { children } ) => {
         createPost,
         checkExistingToken,
         deletePost,
-        location, // Provide the location data
-        getLocationForUser, // Provide the location fetch function
+        location,
+        getUserLocation, 
+        getNearbyMosques,
     };
 
     return (
