@@ -21,6 +21,7 @@ const Search = () => {
 
   const handleMosquePress = (mosque) => {
     if (mosque && mosque.id) {
+      console.log(mosque);
       router.push(`/mosque/${mosque.id}`);
     } else {
       console.error('Invalid mosque object:', mosque);

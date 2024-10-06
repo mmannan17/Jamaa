@@ -7,43 +7,44 @@ import { icons } from '../../constants';
 import SearchInput from '../../components/SearchInput';
 
 const Explore = () => {
+  
   const router = useRouter();
-  const { getNearbyMosques } = useContext(Context);
-  const [nearbyMosques, setNearbyMosques] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { getNearbyMosques, nearbyMosques } = useContext(Context);
+  // const [isLoading, setIsLoading] = useState(true);
+  console.log(nearbyMosques);
+  // useEffect(() => {
+  //   fetchNearbyMosques();
+  // }, []);
 
-  useEffect(() => {
-    fetchNearbyMosques();
-  }, []);
-
-  const fetchNearbyMosques = async () => {
-    setIsLoading(true);
-    try {
-      const mosques = await getNearbyMosques();
-      setNearbyMosques(mosques);
-    } catch (error) {
-      console.error('Error fetching nearby mosques:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const fetchNearbyMosques = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const mosques = await getNearbyMosques();
+  //     setNearbyMosques(mosques);
+  //   } catch (error) {
+  //     console.error('Error fetching nearby mosques:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleMosquePress = (mosque) => {
-    if (mosque && mosque.id) {
-      router.push(`/mosque/${mosque.id}`);
+    if (mosque) {
+      console.log(mosque);
+      router.push(`/mosque/${mosque.mosque.mosque_id}`);
     } else {
       console.error('Invalid mosque object:', mosque);
       Alert.alert('Error', 'Unable to view mosque profile.');
     }
   }
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-primary">
-        <Text className="font-psemibold text-white text-2xl">Loading...</Text>
-      </View>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <View className="flex-1 justify-center items-center bg-primary">
+  //       <Text className="font-psemibold text-white text-2xl">Loading...</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -55,13 +56,13 @@ const Explore = () => {
       </View>
       <FlatList
         data={nearbyMosques}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.mosque_id.toString()}
         renderItem={({item}) => (
           <TouchableOpacity 
             onPress={() => handleMosquePress(item)}
             className="bg-black-100 p-4 m-2 rounded-lg"
           >
-            <Text className="text-white text-lg font-psemibold">Mosque ID: {item.id}</Text>
+            <Text className="text-white text-lg font-psemibold">Mosque ID: {item.mosque_id}</Text>
             <Text className="text-gray-300 mt-1">Distance: {item.distance_miles} miles</Text>
           </TouchableOpacity>
         )}

@@ -20,7 +20,7 @@ const Profile = () => {
       }
       setIsLoading(false);
     };
-
+  
     fetchMosquePosts();
   }, [user]);
 

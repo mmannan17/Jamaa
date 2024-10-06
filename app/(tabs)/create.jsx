@@ -86,7 +86,7 @@ const create = () => {
         form.media.type.startsWith('image') ? (
             <Image 
                 source={{ uri: form.media.uri }} 
-                className="w-full h-64 rounded-2xl" 
+                className="w-full h-64 rounded-2xl"
                 resizeMode="contain" 
             />
         ) : (

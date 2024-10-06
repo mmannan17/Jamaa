@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useCallback } from 'react'
 
-const PostCard = React.memo(({post: {posttype, content, media_file, timestamp, mosque, media_type, profile_pic}}) => {
+const PostCard = React.memo(({post: {title, posttype, content, media_file, timestamp, mosque, media_type, profile_pic}}) => {
     const [play, setPlay] = useState(false)
     const date = new Date(timestamp);
     const formattedDate = date.toISOString().split('T')[0];
@@ -27,7 +27,7 @@ const PostCard = React.memo(({post: {posttype, content, media_file, timestamp, m
             <Text
               className="font-psemibold text-sm text-white"
               numberOfLines={2}>
-              {posttype}
+              {title}
             </Text>
             <Text className="text-xs text-gray-100 font-pregular" numberOfLines={1}>
                 {mosque}

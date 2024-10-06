@@ -18,6 +18,7 @@ const Provider = ( { children } ) => {
     const [mosquePosts, setMosquePosts] = useState([])
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [isLocationShared, setIsLocationShared] = useState(false);
+    const [nearbyMosques, setNearbyMosques] = useState([]);
 
 
 
@@ -209,7 +210,9 @@ const Provider = ( { children } ) => {
       if (locationShared === 'true') {
         const { status } = await Location.getForegroundPermissionsAsync();
         if (status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({});
+          const location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
+          });
           setLocation({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
@@ -250,10 +253,11 @@ const Provider = ( { children } ) => {
       }
 
       const data = await response.json();
+      setNearbyMosques(data);
       return data;
     } catch (error) {
       console.error('Error fetching nearby mosques:', error);
-      Alert.alert('Error', 'Failed to fetch nearby mosques. Please try again.');
+      // Alert.alert('Error', 'Failed to fetch nearby mosques. Please try again.');
       return [];
     }
   };
@@ -381,6 +385,7 @@ const Provider = ( { children } ) => {
         location,
         getUserLocation, 
         getNearbyMosques,
+        nearbyMosques,
     };
 
     return (

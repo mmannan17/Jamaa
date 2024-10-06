@@ -25,6 +25,7 @@ const Home = () => {
     getPosts();
     getMosques();
     getNearbyMosques();
+    onRefresh();
   }, []);
 
   return (
