@@ -22,11 +22,13 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getPosts();
-    getMosques();
-    getNearbyMosques();
-    onRefresh();
-  }, []);
+    const fetchData = async () => {
+      await onRefresh();
+      getPosts();
+      getMosques();
+    };
+    fetchData();
+  }, []); // Add dependencies if needed
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -57,7 +59,7 @@ const Home = () => {
             </View>
           </View>
 
-          <SearchInput/>
+          {/* <SearchInput/> */}
 
           <View className="w-full flex-1 ">
             {/* <Text className="text-xl font-psemibold text-gray-100 mb-3">

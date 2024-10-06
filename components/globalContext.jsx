@@ -152,14 +152,8 @@ const Provider = ( { children } ) => {
 
   const getPosts = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) throw new Error('No token found');
-
-      const response = await fetch(`${domain}/MosqueApp/posts/`, {
+      const response = await authenticatedFetch(`${domain}/MosqueApp/posts/`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
       const data = await response.json();
       if (response.ok) {

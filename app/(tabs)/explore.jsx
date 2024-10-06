@@ -29,9 +29,9 @@ const Explore = () => {
   // };
 
   const handleMosquePress = (mosque) => {
-    if (mosque) {
+    if (mosque && mosque.mosque_id) {
       console.log(mosque);
-      router.push(`/mosque/${mosque.mosque.mosque_id}`);
+      router.push(`/mosque/${mosque.mosque_id}`);
     } else {
       console.error('Invalid mosque object:', mosque);
       Alert.alert('Error', 'Unable to view mosque profile.');
