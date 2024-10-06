@@ -57,7 +57,7 @@ const Home = () => {
             </View>
           </View>
 
-          <SearchInput/>
+          {/* <SearchInput/> */}
 
           <View className="w-full flex-1 ">
             {/* <Text className="text-xl font-psemibold text-gray-100 mb-3">
