@@ -3,40 +3,37 @@ import { View, Text, FlatList, TouchableOpacity, Animated, Alert, Dimensions } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Context } from '../../components/globalContext';
-import NewSearchInput from '../../components/NewSearchInput'; // Import your NewSearchInput component
-import { Ionicons } from '@expo/vector-icons'; // Import icons for the back arrow
+import NewSearchInput from '../../components/NewSearchInput';
+import { Ionicons } from '@expo/vector-icons';
 
 const Explore = () => {
   const router = useRouter();
-  const { getNearbyMosques, nearbyMosques, nearbyEvents } = useContext(Context);
+  const { getNearbyMosques, nearbyMosques, nearbyEvents, mosques } = useContext(Context);
   
   const [search, setSearch] = useState('');
-  const [isFocused, setIsFocused] = useState(false);  // Tracks if search bar is focused
+  const [isFocused, setIsFocused] = useState(false);
   const [filteredMosques, setFilteredMosques] = useState([]);
   
   const screenWidth = Dimensions.get('window').width;
-  const [inputWidth] = useState(new Animated.Value(screenWidth - 20)); // Full screen width initially
-  const [arrowOpacity] = useState(new Animated.Value(0)); // Back arrow opacity (initially hidden)
+  const [inputWidth] = useState(new Animated.Value(screenWidth - 20));
+  const [arrowOpacity] = useState(new Animated.Value(0));
 
-  const searchInputRef = useRef(null);  // Reference to search input to trigger focus/blur
-  console.log(nearbyMosques)
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
-    if (search === '') {
-      setFilteredMosques(nearbyMosques); // Show all mosques if search is empty
+    if (search.trim() === '') {
+      setFilteredMosques(nearbyMosques); // Show nearby mosques if search is empty
     } else {
-      console.log(nearbyMosques)
-      const filtered = nearbyMosques.filter(mosque =>
-        mosque.name.toLowerCase().includes(search.toLowerCase())
+      const filtered = mosques.filter(mosque =>
+        mosque.mosque.mosquename.toLowerCase().startsWith(search.toLowerCase())
       );
-      setFilteredMosques(filtered); // Update filtered list
+      setFilteredMosques(filtered);
     }
-  }, [search, nearbyMosques]);
+  }, [search, mosques, nearbyMosques]);
 
   const handleMosquePress = (mosque) => {
-    // Prevent the search bar from losing focus
     if (mosque) {
-      router.push(`/mosque/${mosque.id}`);  // Directly navigate to the mosque page
+      router.push(`/mosque/${mosque.id}`);
     } else {
       Alert.alert('Error', 'Unable to view mosque profile.');
     }
@@ -45,16 +42,14 @@ const Explore = () => {
   const handleFocus = () => {
     setIsFocused(true);
 
-    // Shrink the search bar to make space for the back arrow
     Animated.timing(inputWidth, {
-      toValue: screenWidth * 0.85, // Shrink to 85% of the screen width
+      toValue: screenWidth * 0.85,
       duration: 200,
       useNativeDriver: false,
     }).start();
 
-    // Show the back arrow with fade-in
     Animated.timing(arrowOpacity, {
-      toValue: 1, // Fully visible
+      toValue: 1,
       duration: 200,
       useNativeDriver: true,
     }).start();
@@ -63,73 +58,68 @@ const Explore = () => {
   const handleBlur = () => {
     setIsFocused(false);
 
-    // Expand the search bar back to full width
     Animated.timing(inputWidth, {
-      toValue: screenWidth - 20, // Full width again
+      toValue: screenWidth - 20,
       duration: 200,
       useNativeDriver: false,
     }).start();
 
-    // Hide the back arrow with fade-out
     Animated.timing(arrowOpacity, {
-      toValue: 0, // Fully hidden
+      toValue: 0,
       duration: 200,
       useNativeDriver: true,
     }).start();
 
-    setSearch(''); // Clear search
+    setSearch('');
   };
 
   const handleBackPress = () => {
-    // Simulate blur by calling handleBlur and actually blur the input
     if (searchInputRef.current) {
-      searchInputRef.current.blur(); // Force the search input to lose focus
+      searchInputRef.current.blur();
     }
-    handleBlur(); // Call the blur logic
+    handleBlur();
   };
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <View className="px-4 mt-8 flex-row items-center">
-        {/* Back Arrow with Fade-in/out */}
         <Animated.View style={{ opacity: arrowOpacity, position: 'absolute', left: 10 }}>
           <TouchableOpacity onPress={handleBackPress}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Animated Search Bar */}
         <Animated.View style={{ width: inputWidth, marginLeft: isFocused ? 30 : 0 }}>
           <NewSearchInput 
-            ref={searchInputRef}  // Attach ref to the search input
+            ref={searchInputRef}
             query={search}
             setQuery={setSearch}
-            onFocus={handleFocus}  // Pass handleFocus to NewSearchInput
-            // onBlur={handleBlur}    // Pass handleBlur to NewSearchInput
+            onFocus={handleFocus}
           />
         </Animated.View>
       </View>
 
-      {/* Conditionally render events or mosques based on isFocused */}
+      {/* Conditionally render filtered mosques or nearby events */}
       {isFocused ? (
         <FlatList
-          data={filteredMosques}
-          keyExtractor={(item) => item.mosque_id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => handleMosquePress(item)}
-              className="bg-black-100 p-4 m-2 rounded-lg"
-            >
-              <Text className="text-white text-lg font-psemibold">Mosque: {item.mosque_id}</Text>
-              <Text className="text-gray-300 mt-1">Distance: {item.distance_miles} miles</Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={() => (
-            <View className="flex-1 justify-center items-center mt-10">
-              <Text className="text-white text-lg">No nearby mosques found</Text>
-            </View>
-          )}
-        />
+        data={filteredMosques}
+        keyExtractor={(item, index) => (item.mosque_id ? item.mosque_id.toString() : index.toString())}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => handleMosquePress(item)}
+            className="bg-black-100 p-4 m-2 rounded-lg"
+          >
+            <Text className="text-white text-lg font-psemibold">{item.mosque.mosquename || `Mosque ID: ${item.mosque_id}`}</Text>
+            <Text className="text-gray-300 mt-1">Address: {item.mosque.address}</Text>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={() => (
+          <View className="flex-1 justify-center items-center mt-10">
+            <Text className="text-white text-lg">No mosques found</Text>
+          </View>
+        )}
+      />
+      
       ) : (
         <FlatList
           data={nearbyEvents}
