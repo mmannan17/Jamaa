@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 
 const Context = createContext()
 
@@ -293,44 +294,73 @@ const Provider = ( { children } ) => {
 
   const createPost = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append('mosque', data.mosque);
-      formData.append('content', data.content);
-      formData.append('posttype', data.posttype);
+      // Step 1: Initial POST request to get the upload URL
+      const initialResponse = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file_name: data.media_file.file_name || 'image.jpg',
+          file_type: data.media_file.file_type || 'image/jpeg',
+        }),
+      });
 
-      if (data.media_file) {
-        const fileUri = data.media_file.uri;
-        const fileType = data.media_file.mimeType || 'image/jpeg';
-        const fileName = data.media_file.fileName || fileUri.split('/').pop() || 'image.jpg';
-
-        formData.append('media_file', {
-          uri: fileUri,
-          type: fileType,
-          name: fileName,
-        });
+      if (!initialResponse.ok) {
+        throw new Error(`HTTP error, status: ${initialResponse.status}`);
       }
 
-      const response = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
-        method: 'POST',
-        body: formData,
+      const initialResult = await initialResponse.json();
+      if (!initialResult.url) {
+        throw new Error('Upload URL not found in the response');
+      }
+      const uploadUrl = initialResult.url.split('?')[0];
+
+      // Step 2: PUT request to upload the binary image
+      const blob = data.media_file.media;
+
+      const putResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: blob,
         headers: {
-          'Accept': 'application/json',
+          'Content-Type': data.media_file.file_type,
         },
       });
 
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response body:', responseText);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error, status: ${response.status}`);
+      if (!putResponse.ok) {
+        throw new Error(`Failed to upload image: ${putResponse.statusText}`);
+      } else {
+        console.log('binary uploaded successfully');
       }
 
-      const result = JSON.parse(responseText);
-      setAllPosts((prevPosts) => [result, ...prevPosts]);
-      return result;
+      // Step 3: Create the post with the uploaded image URL
+      const postResponse = await authenticatedFetch(`${domain}/MosqueApp/post/save/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          posttype: "media",
+          media_type: data.media_file.file_type.startsWith('image') ? "image" : "video",
+          media_url: uploadUrl,
+          mosque_id: user.mosque.mosque_id,
+          mosque_name: user.username,
+          content: data.content
+        }),
+      });
+
+      if (!postResponse.ok) {
+        throw new Error(`Failed to create post: ${postResponse.statusText}`);
+      }
+
+      const postResult = await postResponse.json();
+      
+      // Update the posts state
+      setAllPosts(prevPosts => [postResult, ...prevPosts]);
+
     } catch (error) {
-      console.error('Post creation failed:', error.message || error);
+      console.error('Error in createPost:', error);
       throw error;
     }
   };
