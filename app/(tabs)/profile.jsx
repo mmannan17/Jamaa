@@ -32,7 +32,7 @@ const Profile = () => {
     );
   }
 
-  if (user.role === 'mosque') {
+  if (user && user.role === 'mosque') {
     return (
       <SafeAreaView className="bg-primary h-full">
         <FlatList
@@ -104,7 +104,7 @@ const Profile = () => {
         />
       </SafeAreaView>
     );
-  } else {
+  } else if(user && user.role === 'user'){
     return (
       <SafeAreaView className="bg-primary h-full">
         <View className="flex-1 items-center">

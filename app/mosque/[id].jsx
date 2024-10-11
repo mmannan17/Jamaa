@@ -12,14 +12,14 @@ import { useRouter } from 'expo-router';
 const MosqueProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { mosques, getMosquePosts } = useContext(Context);
+  const { mosques, getMosquePosts, mosquePosts } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   const mosque = mosques.find(m => m.id.toString() === id.toString());
 
   useEffect(() => {
     const fetchMosquePosts = async () => {
-      if (mosque && mosque.mosque && mosque.mosque.mosque_id) {
-        await getMosquePosts(mosque.mosque.mosque_id);
+      if (mosque && mosque.mosque && mosque.mosque.mosquename) {
+        await getMosquePosts(mosque.mosque.mosquename);
       }
       setIsLoading(false);
     };
@@ -70,7 +70,7 @@ const MosqueProfile = () => {
         />
       </TouchableOpacity>
       <FlatList
-        data={mosque.mosque ? mosque.mosque.posts : []}
+        data={mosquePosts}
         keyExtractor={(item) => item.post_id.toString()}
         renderItem={({item}) => (
           <PostCard post={item}/>
