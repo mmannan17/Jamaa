@@ -24,9 +24,12 @@ const create = () => {
         try {
             const postData = {
                 mosque: user.mosque.mosque_id,
-                posttype: form.title, 
+                title: form.title, 
                 content: form.content,
-                media_file: form.media ? form.media : null,
+                media_file: form.media ? {
+                    file_name: form.media.fileName || 'image.png',
+                    file_type: form.media.mimeType || 'image/png'
+                } : null,
             };
 
             console.log('Submitting post data...');
@@ -36,7 +39,6 @@ const create = () => {
             setForm({ title: '', media: null, content: '' });
             Alert.alert('Success', 'Post created successfully!');
         } catch (error) {
-            console.error('Error creating post:', error);
             Alert.alert('Error', 'Failed to create post. Please try again.');
         } finally {
             setUploading(false);
@@ -44,50 +46,50 @@ const create = () => {
     };
 
     const openPicker = async () => {
-  
-      const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All, 
-          allowsEditing: false,
-          quality: 1,
-      });
-  
-      if (!result.canceled) {
-          setForm({
-              ...form,
-              media: result.assets[0], // Save the selected media to form.media
-          });
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,  // This enables the crop feature
+            aspect: [16, 9],  // You can adjust this ratio as needed
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setForm({
+                ...form,
+                media: result.assets[0], // Save the selected and cropped media to form.media
+            });
         }
-  };
+    };
 
-  return (
-    <SafeAreaView className="bg-primary h-full">
-      <ScrollView className="px-4 my-6">
-        <Text className="text-2xl text-white font-psemibold">Create Post</Text>
-        <FormField 
-        title="Post Title"
-        value={form.title}
-        placeholder="Post Title"
-        handleChangeText={(e) => setForm({...form, title: e})}
-        otherStyles="mt-10"
-        />
+    return (
+        <SafeAreaView className="bg-primary h-full">
+            <ScrollView className="px-4 my-6">
+                <Text className="text-2xl text-white font-psemibold">Create Post</Text>
+                <FormField 
+                title="Post Title"
+                value={form.title}
+                placeholder="Post Title"
+                handleChangeText={(e) => setForm({...form, title: e})}
+                otherStyles="mt-10"
+                />
 
-        <FormField 
-        title="Description / Caption (optional)"
-        value={form.content}
-        placeholder="Description"
-        handleChangeText={(e) => setForm({...form, content: e})}
-        otherStyles="mt-5"
-        />
+                <FormField 
+                title="Description / Caption (optional)"
+                value={form.content}
+                placeholder="Description"
+                handleChangeText={(e) => setForm({...form, content: e})}
+                otherStyles="mt-5"
+                />
 
-        <View className="mt-7 space-y-2">
-            <Text className="text-base text-gray-100 font-pmedium">Upload Media (optional)</Text>
-            <TouchableOpacity onPress={() => openPicker()}>
+                <View className="mt-7 space-y-2">
+                    <Text className="text-base text-gray-100 font-pmedium">Upload Media (optional)</Text>
+                    <TouchableOpacity onPress={() => openPicker()}>
     {form.media ? (
         form.media.type.startsWith('image') ? (
             <Image 
                 source={{ uri: form.media.uri }} 
                 className="w-full h-64 rounded-2xl"
-                resizeMode="contain" 
+                resizeMode="cover"  // Changed from "contain" to "cover"
             />
         ) : (
             <Video 
@@ -110,21 +112,21 @@ const create = () => {
         </View>
     )}
 </TouchableOpacity>
-        </View>
-        {/* <View>
-            
-        </View> */}
+                </View>
+                {/* <View>
+                    
+                </View> */}
 
-        <CustomButton
-        title="Submit & Share"
-        handlePress={handleSubmit}
-        containerStyles="mt-7"
-        isLoading={uploading}
-        />
+                <CustomButton
+                title="Submit & Share"
+                handlePress={handleSubmit}
+                containerStyles="mt-7"
+                isLoading={uploading}
+                />
 
-      </ScrollView>
-    </SafeAreaView>
-  )
+            </ScrollView>
+        </SafeAreaView>
+    )
 }
 
 export default create
