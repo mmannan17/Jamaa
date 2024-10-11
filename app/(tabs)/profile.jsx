@@ -12,8 +12,8 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchMosquePosts = async () => {
-      if (user && user.mosque && user.mosque.mosque_id && user.role === 'mosque') {
-        await getMosquePosts(user.mosque.mosque_id);
+      if (user && user.mosque && user.mosque.mosquename && user.role === 'mosque') {
+        await getMosquePosts(user.mosque.mosquename);
       }
       setIsLoading(false);
     };

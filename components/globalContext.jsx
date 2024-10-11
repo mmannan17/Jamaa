@@ -274,9 +274,9 @@ const Provider = ( { children } ) => {
     }
   };
 
-  const getMosquePosts = async (mosqueId) => {
+  const getMosquePosts = async (mosquename) => {
     try {
-      const response = await authenticatedFetch(`${domain}/MosqueApp/posts/?mosque=${mosqueId}`, {
+      const response = await authenticatedFetch(`${domain}/MosqueApp/posts/?mosquename=${mosquename}`, {
         method: 'GET',
       });
       const data = await response.json();
