@@ -9,8 +9,7 @@ import { Context } from '../../components/globalContext';
 
 
 const SignIn = () => {
-  const globalContext = useContext(Context);
-  const { login } = globalContext;
+  const { login } = useContext(Context);
   const router = useRouter();
 
   const [form, setForm] = useState ({

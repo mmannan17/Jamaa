@@ -6,9 +6,17 @@ import EmptyState from '../../components/EmptyState';
 import ProfilePostCard from '../../components/ProfilePostCard';
 import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
+import Feather from '@expo/vector-icons/Feather';
+import { useRouter } from 'expo-router';
+
+ 
+
+
 const Profile = () => {
   const { user, mosquePosts, getMosquePosts, logout, profile_pic } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter(); // Use router for navigation
+
 
   useEffect(() => {
     const fetchMosquePosts = async () => {
@@ -20,6 +28,7 @@ const Profile = () => {
   
     fetchMosquePosts();
   }, [user]);
+
 
   const hasAddress = user?.mosque?.address;
   const hasEmail = user?.mosque?.email;
@@ -104,19 +113,18 @@ const Profile = () => {
         />
       </SafeAreaView>
     );
-  } else if(user && user.role === 'user'){
+  } else if (user && user.role === 'user') {
     return (
       <SafeAreaView className="bg-primary h-full">
         <View className="flex-1 items-center">
           <View className="w-full items-center mt-6 mb-12 px-4">
-            <TouchableOpacity className="w-full items-end mb-4" onPress={logout}>
-              <Image
-                source={icons.logout}
-                className="w-6 h-6"
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-
+          <TouchableOpacity
+            className="w-full items-end mb-4"
+            onPress={() => router.push('/edit/settings')} // Replace '/settings' with your actual settings route if different
+          >
+            <Feather name="settings" size={28} color="white" />
+          </TouchableOpacity>
+  
             <View className="w-32 h-32 border-2 border-secondary rounded-full justify-center items-center overflow-hidden mb-4">
               <Image
                 source={{ uri: profile_pic || 'https://ohsobserver.com/wp-content/uploads/2022/12/Guest-user.png' }}
@@ -128,7 +136,7 @@ const Profile = () => {
             <Text className="text-xl font-psemibold text-white mb-4">
               {user ? user.username : 'User'}
             </Text>
-
+  
             <View className="flex-row justify-center w-full">
               {hasAddress && (
                 <CustomButton
@@ -148,17 +156,31 @@ const Profile = () => {
               )}
             </View>
           </View>
-
-          <CustomButton
-            title="View Followed Mosques"
-            handlePress={() => {/* Add logic to navigate to the followed mosques list */}}
-            containerStyles="min-h-[50px] bg-secondary"
-            textStyles="text-base"
-          />
+  
+          <View className="flex-row justify-center w-full space-x-4 px-4">
+            <CustomButton
+                title="Edit Profile"
+                handlePress={() => {
+                  // Add logic to navigate to or open the edit profile screen/modal
+                }}
+                containerStyles="min-h-[50px] bg-secondary flex-1 mr-4"
+                textStyles="text-base"
+              />
+            <CustomButton
+              title="Followed Mosques"
+              handlePress={() => {
+                // Add logic to navigate to the followed mosques list
+              }}
+              containerStyles="min-h-[50px] bg-secondary flex-1"
+              textStyles="text-base"
+            />
+  
+          </View>
         </View>
       </SafeAreaView>
     );
   }
+  
 };
 
 export default Profile;
