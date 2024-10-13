@@ -13,7 +13,7 @@ const Settings = () => {
     <SafeAreaView className="bg-primary h-full">
       <View className="w-full px-4 mt-6">
         <TouchableOpacity onPress={() => router.back()} className="mb-4">
-        <Ionicons name="arrow-back" size={24} color="white" />
+        <Ionicons name="arrow-back" size={26} color="white" />
         </TouchableOpacity>
       </View>
       

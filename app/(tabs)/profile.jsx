@@ -64,14 +64,12 @@ const Profile = () => {
           )}
           ListHeaderComponent={() => (
             <View className="w-full items-center mt-6 mb-12 px-4">
-              <TouchableOpacity className="w-full items-end mb-4" onPress={logout}>
-                <Image
-                  source={icons.logout}
-                  className="w-6 h-6"
-                  resizeMode="contain"
-                />
+              <TouchableOpacity
+                className="w-full items-end mb-4"
+                onPress={() => router.push('/edit/settings')} // Replace '/settings' with your actual settings route if different
+              >
+                <Feather name="settings" size={28} color="white" />
               </TouchableOpacity>
-
               <View className="w-32 h-32 border-2 border-secondary rounded-full justify-center items-center overflow-hidden mb-4">
                 <Image
                   source={{ uri: profile_pic || 'https://ohsobserver.com/wp-content/uploads/2022/12/Guest-user.png' }}
