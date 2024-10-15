@@ -115,7 +115,7 @@ const Explore = () => {
         )}
         ListEmptyComponent={() => (
           <View className="flex-1 justify-center items-center mt-10">
-            <Text className="text-white text-lg">No mosques found</Text>
+            <Text className="text-white text-lg">No mosques found nearby</Text>
           </View>
         )}
       />

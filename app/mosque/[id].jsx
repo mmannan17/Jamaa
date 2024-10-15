@@ -8,6 +8,7 @@ import PostCard from '../../components/postCard';
 import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import { useRouter } from 'expo-router';
+import TimeTable from '../../components/TimeTable';
 
 const MosqueProfile = () => {
   const router = useRouter();
@@ -76,7 +77,7 @@ const MosqueProfile = () => {
           <PostCard post={item}/>
         )}
         ListHeaderComponent={() => (
-          <View className="w-full items-center mt-6 mb-12 px-4">
+          <View className="w-full items-center mt-2 mb-12 px-4">
             <View className="w-32 h-32 border-2 border-secondary rounded-full justify-center items-center overflow-hidden mb-4">
               <Image
                 source={{uri: mosque.profile_pic || 'https://ohsobserver.com/wp-content/uploads/2022/12/Guest-user.png'}}
@@ -105,6 +106,20 @@ const MosqueProfile = () => {
                   textStyles="text-base"
                 />
               )}
+            </View>
+
+            <View className="w-full mt-6">
+              <TimeTable 
+                mosqueName={mosque.username}
+                prayerTimes={{
+                  fajr: "05:30",
+                  sunrise: "06:45",
+                  dhuhr: "12:30",
+                  asr: "15:45",
+                  maghrib: "18:15",
+                  isha: "19:30"
+                }}
+              />
             </View>
           </View>   
         )}

@@ -8,14 +8,14 @@ import { icons } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
-
- 
-
+import TimeTable from '../../components/TimeTable';
 
 const Profile = () => {
-  const { user, mosquePosts, getMosquePosts, logout, profile_pic } = useContext(Context);
+  const { user, mosquePosts, getMosquePosts, logout, profile_pic, deletePost } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter(); // Use router for navigation
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const router = useRouter(); 
 
 
   useEffect(() => {
@@ -28,6 +28,46 @@ const Profile = () => {
   
     fetchMosquePosts();
   }, [user]);
+
+  const openMap = (address) => {
+    const encodedAddress = encodeURIComponent(address);
+    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+    const url = Platform.select({
+      ios: `${scheme}${encodedAddress}`,
+      android: `${scheme}${encodedAddress}`
+    });
+
+    Linking.openURL(url).catch((err) => {
+      Alert.alert('Error', 'Unable to open map application.');
+    });
+  };
+
+  const openEmail = (email) => {
+    Linking.openURL(`mailto:${email}`).catch((err) => {
+      Alert.alert('Error', 'Unable to open email application.');
+    });
+  };
+
+  const openMenu = (postId) => {
+    setSelectedPostId(postId);
+    setModalVisible(true);
+  };
+
+  const handleDeletePost = async () => {
+    if (selectedPostId) {
+      const success = await deletePost(selectedPostId);
+      if (success) {
+        // Refresh the posts
+        if (user && user.mosque && user.mosque.mosquename) {
+          await getMosquePosts(user.mosque.mosquename);
+        }
+      } else {
+        // Handle deletion failure
+        Alert.alert('Error', 'Failed to delete the post. Please try again.');
+      }
+    }
+    setModalVisible(false);
+  };
 
 
   const hasAddress = user?.mosque?.address;
@@ -100,7 +140,21 @@ const Profile = () => {
                   />
                 )}
               </View>
-            </View>   
+
+              <View className="w-full mt-6">
+                <TimeTable 
+                  mosque={{
+                    name: user.mosque.mosquename,
+                    fajr: '05:30',
+                    sunrise: '06:00',
+                    dhuhr: '13:15',
+                    asr: '16:45',
+                    maghrib: '19:30',
+                    isha: '21:00',
+                  }}
+                />
+              </View>
+            </View>
           )}
           ListEmptyComponent={() => (
             <EmptyState
@@ -109,6 +163,30 @@ const Profile = () => {
             />
           )}
         />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+            <View className="bg-primary p-5 rounded-lg w-4/5">
+              <Text className="text-white text-lg mb-4">Delete this post?</Text>
+              <View className="flex-row justify-between">
+                <CustomButton
+                  title="Cancel"
+                  handlePress={() => setModalVisible(false)}
+                  containerStyles="flex-1 mr-2"
+                />
+                <CustomButton
+                  title="Delete"
+                  handlePress={handleDeletePost}
+                  containerStyles="flex-1 ml-2 bg-red-500"
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     );
   } else if (user && user.role === 'user') {

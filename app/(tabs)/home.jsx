@@ -6,6 +6,7 @@ import SearchInput from '../../components/SearchInput'
 import EmptyState from '../../components/EmptyState'
 import { Context } from '../../components/globalContext'
 import PostCard from '../../components/postCard'
+import TimeTableCarousel from '../../components/TimeTableCarousel'
 
 const Home = () => {
   const { getPosts, user, allPosts, mosques, getMosques, nearbyMosques, getNearbyMosques } = useContext(Context);
@@ -66,6 +67,8 @@ const Home = () => {
             {/* <Text className="text-xl font-psemibold text-gray-100 mb-3">
               Latest Posts
             </Text> */}
+
+            <TimeTableCarousel/>
 
           </View>
         </View>
