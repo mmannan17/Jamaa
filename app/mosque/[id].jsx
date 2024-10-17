@@ -109,17 +109,17 @@ const MosqueProfile = () => {
             </View>
 
             <View className="w-full mt-6">
-              <TimeTable 
-                mosqueName={mosque.username}
-                prayerTimes={{
-                  fajr: "05:30",
-                  sunrise: "06:45",
-                  dhuhr: "12:30",
-                  asr: "15:45",
-                  maghrib: "18:15",
-                  isha: "19:30"
-                }}
-              />
+            <TimeTable 
+                  mosque={{
+                    name: mosque.mosquename,
+                    fajr: '05:30',
+                    sunrise: '06:00',
+                    dhuhr: '13:15',
+                    asr: '16:45',
+                    maghrib: '19:30',
+                    isha: '21:00',
+                  }}
+                />
             </View>
           </View>   
         )}
