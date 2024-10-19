@@ -294,46 +294,66 @@ const Provider = ( { children } ) => {
 
   const createPost = async (data) => {
     try {
-      // Step 1: Initial POST request to get the upload URL
-      const initialResponse = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          file_name: data.media_file.file_name || 'image.jpg',
-          file_type: data.media_file.file_type || 'image/jpeg',
-        }),
-      });
+      let uploadUrl = "";
 
-      if (!initialResponse.ok) {
-        throw new Error(`HTTP error, status: ${initialResponse.status}`);
+      // Only proceed with image upload if media_file exists
+      if (data.media_file) {
+        // Step 1: Initial POST request to get the upload URL
+        const initialResponse = await authenticatedFetch(`${domain}/MosqueApp/post/media/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            file_name: data.media_file.file_name || 'image.jpg',
+            file_type: data.media_file.file_type || 'image/jpeg',
+          }),
+        });
+
+        if (!initialResponse.ok) {
+          throw new Error(`HTTP error, status: ${initialResponse.status}`);
+        }
+
+        const initialResult = await initialResponse.json();
+        if (!initialResult.url) {
+          throw new Error('Upload URL not found in the response');
+        }
+        uploadUrl = initialResult.url.split('?')[0];
+        console.log(uploadUrl)
+
+        console.log("Made it through step 1")
+
+        // Step 2: PUT request to upload the binary image
+        let blob;
+        try {
+          const response = await fetch(data.media_file.media.uri);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image, status: ${response.status}`);
+          }
+
+          blob = await response.blob();
+          console.log('Blob size:', blob.size);
+        } catch (error) {
+          console.error('Blob creation failed:', error);
+          throw error;
+        }
+        
+        const putResponse = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: blob,
+          headers: {
+            'Content-Type': data.media_file.media.mimeType,
+          },
+        });
+
+        if (!putResponse.ok) {
+          throw new Error(`Failed to upload image: ${putResponse.statusText}`);
+        } else {
+          console.log('binary uploaded successfully');
+        }
       }
 
-      const initialResult = await initialResponse.json();
-      if (!initialResult.url) {
-        throw new Error('Upload URL not found in the response');
-      }
-      const uploadUrl = initialResult.url.split('?')[0];
-
-      // Step 2: PUT request to upload the binary image
-      const blob = data.media_file.media;
-
-      const putResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: blob,
-        headers: {
-          'Content-Type': data.media_file.file_type,
-        },
-      });
-
-      if (!putResponse.ok) {
-        throw new Error(`Failed to upload image: ${putResponse.statusText}`);
-      } else {
-        console.log('binary uploaded successfully');
-      }
-
-      // Step 3: Create the post with the uploaded image URL
+      // Step 3: Create the post with or without the uploaded image URL
       const postResponse = await authenticatedFetch(`${domain}/MosqueApp/post/save/`, {
         method: 'POST',
         headers: {
@@ -341,8 +361,8 @@ const Provider = ( { children } ) => {
         },
         body: JSON.stringify({
           title: data.title,
-          posttype: "media",
-          media_type: data.media_file.file_type.startsWith('image') ? "image" : "video",
+          posttype: data.postType,
+          media_type: data.media_file.file_type ||  "blank",
           media_url: uploadUrl,
           mosque_id: user.mosque.mosque_id,
           mosque_name: user.username,
@@ -355,7 +375,8 @@ const Provider = ( { children } ) => {
       }
 
       const postResult = await postResponse.json();
-      
+
+      console.log("Made it through step 3")
       // Update the posts state
       setAllPosts(prevPosts => [postResult, ...prevPosts]);
 

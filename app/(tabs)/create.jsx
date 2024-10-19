@@ -8,6 +8,7 @@ import CustomButton from '../../components/CustomButton';
 import * as ImagePicker from 'expo-image-picker';
 import Dropdown from '../../components/DropDown';
 import { Context } from '../../components/globalContext';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const create = () => {
     const [uploading, setUploading] = useState(false)
@@ -17,28 +18,36 @@ const create = () => {
         title: '',
         media: null,
         content: '',
+        postType: 'media',
+        media_file: null,
     })
 
     const handleSubmit = async () => {
         setUploading(true);
         try {
+            let mediaFile = null;
+            if (form.media) {
+                mediaFile = {
+                    file_name: form.media.uri ? form.media.uri.split('/').pop() : 'image.png',
+                    file_type: form.media.type || 'image/png',
+                    media: form.media
+                };
+            }
             const postData = {
                 mosque: user.mosque.mosque_id,
                 title: form.title, 
                 content: form.content,
-                media_file: form.media ? {
-                    file_name: form.media.fileName || 'image.png',
-                    file_type: form.media.mimeType || 'image/png'
-                } : null,
+                postType: form.postType,
+                media_file: mediaFile,
             };
 
-            console.log('Submitting post data...');
-            const result = await createPost(postData);
-            console.log('Post created successfully');
+            await createPost(postData);
+            
             // Clear form or navigate away
-            setForm({ title: '', media: null, content: '' });
+            setForm({ title: '', media: null, content: '', postType: 'post' });
             Alert.alert('Success', 'Post created successfully!');
         } catch (error) {
+            console.error('Error creating post:', error);
             Alert.alert('Error', 'Failed to create post. Please try again.');
         } finally {
             setUploading(false);
@@ -48,15 +57,38 @@ const create = () => {
     const openPicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,  // This enables the crop feature
-            aspect: [16, 9],  // You can adjust this ratio as needed
+            allowsEditing: true,
+            aspect: [16, 9],
             quality: 1,
+            videoMaxDuration: 60, // Limit video duration to 60 seconds
         });
 
         if (!result.canceled) {
+            const asset = result.assets[0];
+            let manipulatedMedia = asset;
+
+            if (asset.type === 'image') {
+                // For images, manipulate as before
+                manipulatedMedia = await ImageManipulator.manipulateAsync(
+                    asset.uri,
+                    [{ resize: { width: 1080 } }],
+                    { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+                );
+            } else if (asset.type === 'video') {
+                // For videos, we don't manipulate but you might want to add video compression here
+                // This would require a third-party library or native module
+                console.log('Video selected:', asset.uri);
+            }
+
             setForm({
                 ...form,
-                media: result.assets[0], // Save the selected and cropped media to form.media
+                media: {
+                    ...asset,
+                    uri: manipulatedMedia.uri,
+                    width: manipulatedMedia.width,
+                    height: manipulatedMedia.height,
+                    type: asset.type, // Explicitly set the type
+                },
             });
         }
     };
@@ -74,11 +106,22 @@ const create = () => {
                 />
 
                 <FormField 
-                title="Description / Caption (optional)"
+                title="Description (optional)"
                 value={form.content}
                 placeholder="Description"
                 handleChangeText={(e) => setForm({...form, content: e})}
                 otherStyles="mt-5"
+                />
+
+                <Dropdown
+                    title="Post Type"
+                    value={form.postType}
+                    placeholder="Select Post Type"
+                    options={[
+                        { label: 'Post', value: 'media' },
+                        { label: 'Event', value: 'event' },
+                    ]}
+                    handleChangeText={(value) => setForm({...form, postType: value})}
                 />
 
                 <View className="mt-7 space-y-2">
@@ -111,18 +154,18 @@ const create = () => {
             </View>
         </View>
     )}
-</TouchableOpacity>
-                </View>
-                {/* <View>
-                    
-                </View> */}
+        </TouchableOpacity>
+            </View>
+            {/* <View>
+                
+            </View> */}
 
-                <CustomButton
-                title="Submit & Share"
-                handlePress={handleSubmit}
-                containerStyles="mt-7"
-                isLoading={uploading}
-                />
+            <CustomButton
+            title="Submit & Share"
+            handlePress={handleSubmit}
+            containerStyles="mt-7"
+            isLoading={uploading}
+            />
 
             </ScrollView>
         </SafeAreaView>
