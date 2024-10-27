@@ -21,6 +21,25 @@ from .utils import haversine,get_grid,GRID_SIZE
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 logger = logging.getLogger(__name__)
+import boto3
+import json
+import os
+from dotenv import load_dotenv
+import openai
+import pytesseract
+from PIL import Image
+import base64
+import io
+from openpyxl import Workbook
+import pandas as pd
+from datetime import time
+
+from openai import OpenAI
+load_dotenv()
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=OPENAI_API_KEY)
+pytesseract_path = os.getenv('PYTESSERACT_PATH')
+pytesseract.pytesseract.tesseract_cmd = pytesseract_path
 
 def index(request):
     return HttpResponse("Welcome to the Mosque App")
@@ -206,13 +225,24 @@ class PostMediaView(APIView):
             logger.error(f"Permission denied for user {request.user} to post media")
             return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            logger.info(f"Media posted: {serializer.data}")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"Post media failed: {serializer.errors}")
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        file_name = request.data.get('file_name')
+        file_type = request.data.get('file_type')
+
+        s3_client = boto3.client('s3', region_name=settings.AWS_S3_REGION_NAME,
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+       
+        try:
+            # Generate pre-signed URL for direct upload to S3
+            presigned_url = s3_client.generate_presigned_url('put_object',
+                                                             Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                                                                     'Key': f"media/{file_name}",
+                                                                     'ContentType': file_type},
+                                                             ExpiresIn=3600)  # URL expires in 1 hour
+            return Response({'url': presigned_url, 'file_name': file_name}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error generating pre-signed URL: {e}")
+            return Response({'error': 'Failed to generate upload URL'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PostEventView(APIView):
@@ -288,7 +318,9 @@ class NearbyMosquesView(APIView):
     def get(self, request):
         lat = float(request.query_params.get('lat'))
         lon = float(request.query_params.get('lon'))
-        distance_miles = DRIVING_DISTANCE_MILES  #max mosque distance is within a 30 minute drive
+        distance_miles = DRIVING_DISTANCE_MILES  # max mosque distance is within a 30 minute drive or 20 miles subject to user preference
+                                                 # can be increased or decreased in settings but for now its hard coded 
+                                                 #later can be changed into a variable 
 
         logger.info(f"User {request.user} requesting nearby mosques for lat: {lat}, lon: {lon}, distance: {distance_miles} miles")
 
@@ -317,7 +349,8 @@ class NearbyMosquesView(APIView):
             distance_to_mosque_miles = distance_to_mosque_km * KM_TO_MILES
             if distance_to_mosque_miles <= distance_miles:
                 mosques.append({
-                    'id': mosque.mosque_id,
+                    'mosque_id': mosque.mosque_id,
+                    "mosquename":mosque.mosquename,
                     'distance_miles': f"{distance_to_mosque_miles:.2f}"
                 })
 
@@ -335,7 +368,8 @@ class MosqueVerificationView(APIView):
 
     def post(self, request):
         logger.info(f"User {request.user} attempting to verify mosque")
-        # Add your verification logic here
+        # verification logic here 
+        # currently working on ways to verify mosques
         return Response({'status': 'Mosque verification logic not implemented'}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -360,6 +394,27 @@ class GetUserDetailView(RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
+
+
+class GetMosqueDetailView(RetrieveAPIView):
+    """
+    View to retrieve a mosque by ID or name.
+    """
+    queryset = Mosque.objects.all()
+    serializer_class = MosqueSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Get the value from URL parameters
+        lookup_value = self.kwargs.get('lookup_value')
+
+        # Try to get the mosque by ID or by name
+        if lookup_value.isdigit():
+            # If it's a digit, assume it's an ID
+            return get_object_or_404(Mosque, pk=lookup_value)
+        else:
+            # Otherwise, assume it's a name
+            return get_object_or_404(Mosque, name=lookup_value)
 
 class GetPostsView(ListAPIView):
     """
@@ -415,6 +470,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from django.contrib.auth import authenticate, get_user_model
 from .serializers import CustomUserSerializer
 import logging
@@ -484,3 +540,284 @@ class NearbyEventsView(APIView):
         logger.info(f"Nearby events fetched successfully")
 
         return Response(events_list, status=status.HTTP_200_OK)
+    
+
+
+class DeletePostsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, post_id):
+        logger.info(f"User {request.user} attempting to delete post id: {post_id}")
+        
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            logger.error(f"Post with id {post_id} not found")
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # The mosque associated with the post
+        mosque = post.mosque
+
+        # The user associated with the mosque
+        mosque_user = mosque.user
+
+        # Check if the requesting user is the mosque user or has the appropriate role
+        if request.user != mosque_user and request.user.role != 'mosque':
+            logger.error(f"User {request.user} does not have permission to delete post {post_id}")
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        post.delete()
+        logger.info(f"Post {post_id} deleted by user {request.user}")
+        return Response({'status': 'Post deleted successfully'}, status=status.HTTP_200_OK)
+    
+
+
+class SavePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user  # The logged-in user who created the post
+        data = request.data
+
+        # Get the mosque by mosque_id or name
+        mosque_id = data.get('mosque_id')
+        mosque_name = data.get('mosque_name')
+
+        try:
+            if mosque_id:
+                mosque = Mosque.objects.get(mosque_id=mosque_id)  
+            elif mosque_name:
+                mosque = Mosque.objects.get(mosquename=mosque_name)
+            else:
+                return Response({'error': 'Mosque ID or name is required'}, status=status.HTTP_400_BAD_REQUEST)
+        except Mosque.DoesNotExist:
+            return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        
+        post_data = {
+            'title': data.get('title',''),
+            'posttype': data.get('posttype', ''),
+            'content': data.get('content', ''),
+            'media_file': data.get('media_url', ''),
+            'media_type': data.get('media_type', ''),
+            'mosque': mosque.mosque_id,  
+        }
+
+        
+        serializer = PostSerializer(data=post_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class EditPostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, post_id):
+        logger.info(f"User {request.user} attempting to edit post id: {post_id}")
+        
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            logger.error(f"Post with id {post_id} not found")
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if the requesting user is the mosque user or has the appropriate role
+        if request.user != post.mosque.user and request.user.role != 'mosque':
+            logger.error(f"User {request.user} does not have permission to edit post {post_id}")
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"Post {post_id} edited by user {request.user}")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.error(f"Edit post failed: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+    
+class EditProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        logger.info(f"User {request.user} attempting to edit profile")
+        
+        try:
+            user = request.user
+            user.username = request.data.get('username', user.username)
+            user.email = request.data.get('email', user.email)
+            user.mosquename = request.data.get('mosquename', user.mosquename)
+            user.address = request.data.get('address', user.address)
+            user.latitude = request.data.get('latitude', user.latitude)
+            user.longitude = request.data.get('longitude', user.longitude)
+            user.prayer_times = request.data.get('prayer_times', user.prayer_times)
+            user.save()
+            logger.info(f"Profile updated for user {user}")
+            return Response({'status': 'Profile updated successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Profile update failed: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class EditMosqueView(APIView):
+    permission_classes = [IsAuthenticated] 
+
+    def put(self, request):
+        logger.info(f"User {request.user} attempting to edit mosque")
+
+        try:
+            mosque = request.user.mosque
+        except Mosque.DoesNotExist:
+            logger.error(f"Mosque for user {request.user} not found")
+            return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        mosque.mosquename = request.data.get('mosquename', mosque.mosquename)
+        mosque.email = request.data.get('email', mosque.email)
+        mosque.description = request.data.get('description', mosque.description)
+        mosque.profile_pic = request.data.get('profile_pic', mosque.profile_pic)
+        mosque.prayer_times = request.data.get('prayer_times', mosque.prayer_times)
+        mosque.address = request.data.get('address', mosque.address)
+        mosque.lat = request.data.get('lat', mosque.lat)
+        mosque.lon = request.data.get('lon', mosque.lon)
+        mosque.grid_cell_lat = request.data.get('grid_cell_lat', mosque.grid_cell_lat)
+        mosque.grid_cell_lon = request.data.get('grid_cell_lon', mosque.grid_cell_lon)
+
+        try:
+            mosque.save()
+            logger.info(f"Mosque profile updated for user {request.user}")
+            return Response({'status': 'Mosque profile updated successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Mosque profile update failed: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
+
+
+class DeleteEventView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def delete(self,request,event_id):
+        logger.info(f"User {request.user} attempting to delete event id: {event_id}")
+    
+        try:
+            event=Events.object.get(event_id=event_id)
+        except Events.DoesNotExist:
+            return Response({'error':'Event not found'},status=status.HTTP_404_NOT_FOUND)
+        
+        # The mosque associated with the event
+        mosque=event.mosque
+
+        # The user associated with the mosque
+        mosque_user=mosque.user
+
+        # Check if the requesting user is the mosque user or has the appropriate role
+        if request.user != mosque_user and request.user.role != 'mosque':
+            logger.error(f"User {request.user} does not have permission to delete event {event_id}")
+            return Response({'error':'Permission denied'},status=status.HTTP_403_FORBIDDEN)
+        
+        event.delete()
+        logger.info(f"Event {event_id} deleted by user {request.user}")
+        return Response({'status':'Event deleted successfully'},status=status.HTTP_200_OK)
+    
+
+
+        
+
+
+
+
+logger = logging.getLogger(__name__)
+
+class PrayerTimeUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logger.info(f"User {request.user} attempting to upload prayer times")
+
+        excel_file = request.FILES.get('file')
+        if not excel_file:
+            return Response({'error': 'No Excel file uploaded'}, status=400)
+
+        # Step 1: Extract data from the Excel file
+        try:
+            json_data = self.extract_data_from_excel(excel_file)
+            logger.info(f"Extracted Data:\n{json_data}")
+        except Exception as e:
+            logger.error(f"Failed to extract data from Excel: {e}")
+            return Response({'error': 'Failed to extract data from Excel'}, status=500)
+
+        # Step 2: Send data to OpenAI and get the structured result
+        try:
+            structured_result = self.send_to_openai(json_data)
+            logger.info(f"Structured JSON from OpenAI:\n{structured_result}")
+        except Exception as e:
+            logger.error(f"Failed to process data with OpenAI: {e}")
+            return Response({'error': 'Failed to process data with OpenAI'}, status=500)
+
+        # Save the prayer times to the mosque's prayer_times field
+        try:
+            prayer_times_dict = structured_result
+            mosque = request.user.mosque
+            mosque.prayer_times = prayer_times_dict
+            mosque.save()
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON response: {e}")
+            return Response({'error': 'Invalid JSON format from AI'}, status=500)
+
+        logger.info(f"Prayer times uploaded successfully for mosque {mosque}")
+        return Response({'status': 'Prayer times uploaded successfully'}, status=200)
+
+    def extract_data_from_excel(self, excel_file):
+        df = pd.read_excel(excel_file)
+        # Convert the DataFrame to a list of dictionaries
+        return df.to_dict(orient='records')
+
+    def send_to_openai(self, data):
+        # Convert time objects to strings
+        data = self.convert_time_to_string(data)
+        
+        # Convert the dictionary to a JSON string
+        json_data = json.dumps(data)
+        
+        prompt = (
+            "Extract iqama times for each day from the following data and return them in a structured JSON format. "
+            "Use the date as the key and include only the iqama times. Ensure the output is valid JSON:\n"
+            f"{json_data}"
+        )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        content = response.choices[0].message.content.strip()
+
+        try:
+            start_index = content.find('{')
+            end_index = content.rfind('}') + 1
+            json_str = content[start_index:end_index]
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON response: {e}")
+            raise ValueError("Invalid JSON format from AI")
+
+    def convert_time_to_string(self, data):
+        for entry in data:
+            for key, value in entry.items():
+                if isinstance(value, time):
+                    entry[key] = value.strftime("%H:%M")
+        return data
+
+
+
+### get events for a specific mosque
+
+
+
+
+
+
+
+
+
+

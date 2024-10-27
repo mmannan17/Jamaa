@@ -12,7 +12,7 @@ class EventSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['post_id', 'mosque', 'posttype', 'content', 'media_type', 'media_file', 'events', 'timestamp', 'likes']
+        fields = ['post_id', 'mosque','title', 'posttype', 'content', 'media_type', 'media_file', 'event_details', 'event_date', 'timestamp', 'likes'] 
 
 class MosqueSerializer(serializers.ModelSerializer):
     posts = PostSerializer(many=True, read_only=True)
