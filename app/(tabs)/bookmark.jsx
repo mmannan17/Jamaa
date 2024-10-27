@@ -11,8 +11,8 @@ const Bookmark = () => {
 
   const handleMosquePress = (mosque) => {
     if (mosque && mosque.id) {
-      console.log(mosque);
-      router.push(`/mosque/${mosque.id}`);
+      console.log(mosque.mosque.mosque_id);
+      router.push(`/mosque/${mosque.mosque.mosque_id}`);
     } else {
       console.error('Invalid mosque object:', mosque);
       Alert.alert('Error', 'Unable to view mosque profile.');
@@ -21,6 +21,9 @@ const Bookmark = () => {
 
   const filteredMosques = searchQuery
     ? mosques.filter(mosque =>
+        mosque &&
+        mosque.mosque &&
+        mosque.mosque.mosquename &&
         mosque.mosque.mosquename.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : nearbyMosques;

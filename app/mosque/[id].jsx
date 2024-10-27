@@ -15,7 +15,8 @@ const MosqueProfile = () => {
   const { id } = useLocalSearchParams();
   const { mosques, getMosquePosts, mosquePosts } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
-  const mosque = mosques.find(m => m.id.toString() === id.toString());
+  console.log("mosques", mosques);
+  const mosque = mosques.find(m => m.mosque.mosque_id.toString() === id.toString());
 
   useEffect(() => {
     const fetchMosquePosts = async () => {
@@ -111,7 +112,6 @@ const MosqueProfile = () => {
             <View className="w-full mt-6">
             <TimeTable 
                   mosque={{
-                    name: mosque.mosquename,
                     fajr: '05:30',
                     sunrise: '06:00',
                     dhuhr: '13:15',
