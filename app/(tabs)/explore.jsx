@@ -27,12 +27,16 @@ const Explore = () => {
       const filtered = mosques.filter(mosque =>
         mosque.mosque.mosquename.toLowerCase().startsWith(search.toLowerCase())
       );
+      console.log(filtered);
       setFilteredMosques(filtered);
     }
   }, [search, mosques, nearbyMosques]);
 
   const handleMosquePress = (mosque) => {
-    if (mosque) {
+    if (mosque.mosque) {
+      router.push(`/mosque/${mosque.mosque.mosque_id}`);
+    }
+    else if (mosque) {
       router.push(`/mosque/${mosque.mosque_id}`);
     } else {
       Alert.alert('Error', 'Unable to view mosque profile.');
@@ -109,8 +113,10 @@ const Explore = () => {
             onPress={() => handleMosquePress(item)}
             className="bg-black-100 p-4 m-2 rounded-lg"
           >
-            <Text className="text-white text-lg font-psemibold">{item.mosquename || `Mosque ID: ${item.mosque_id}`}</Text>
-            <Text className="text-gray-300 mt-1">Distance: {item.distance_miles} Miles</Text>
+            <Text className="text-white text-lg font-psemibold">{item.mosquename ||  item.mosque.mosquename}</Text>
+            <Text className="text-gray-300 mt-1">
+              {item.distance_miles ? `Distance: ${item.distance_miles} Miles` : `Address: ${item.mosque?.address}`}
+            </Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
