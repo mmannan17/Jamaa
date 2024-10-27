@@ -43,6 +43,7 @@ class Mosque(models.Model):
     lon = models.FloatField(default=0.0)
     grid_cell_lat = models.IntegerField(default=0)
     grid_cell_lon = models.IntegerField(default=0)
+    nonprofitform = models.FileField(upload_to='mosque_verification/', blank=True, null=True,default='placeholder.pdf')
 
     class Meta:
         permissions = [
@@ -70,7 +71,7 @@ class Post(models.Model):
     event_date = models.DateTimeField(blank=True, null=True)  # Event date and time (for event posts)
     likes = models.ManyToManyField(CustomUser, related_name='liked_posts', blank=True)  # Tracks users who liked the post
     timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set when the post is created
-
+    
     def __str__(self):
         return f'{self.mosque.mosquename} - {self.posttype} - {self.content[:30]}...'
 
