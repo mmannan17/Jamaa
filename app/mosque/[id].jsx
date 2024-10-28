@@ -13,8 +13,9 @@ import TimeTable from '../../components/TimeTable';
 const MosqueProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { mosques, getMosquePosts, mosquePosts } = useContext(Context);
+  const { mosques, getMosquePosts, mosquePosts, followMosque, unfollowMosque } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
   const mosque = mosques.find(m => m.mosque.mosque_id.toString() === id.toString());
 
   useEffect(() => {
@@ -28,6 +29,24 @@ const MosqueProfile = () => {
 
     fetchMosquePosts();
   }, [mosque]);
+
+  const toggleFollow = async () => {
+    try {
+      if (isFollowing) {
+        const success = await unfollowMosque(mosque.mosque.mosque_id);
+        if (success) {
+          setIsFollowing(false);
+        }
+      } else {
+        const success = await followMosque(mosque.mosque.mosque_id);
+        if (success) {
+          setIsFollowing(true);
+        }
+      }
+    } catch (error) {
+      Alert.alert("Error", "Unable to update follow status.");
+    }
+  };
 
   const openMap = (address) => {
     const encodedAddress = encodeURIComponent(address);
@@ -91,6 +110,12 @@ const MosqueProfile = () => {
             </Text>
 
             <View className="flex-row justify-center w-full">
+              <CustomButton
+                  title={isFollowing ? "Following" : "Follow"}
+                  handlePress={toggleFollow}
+                  containerStyles={`min-h-[45px] flex-1 mr-2 ${isFollowing ? 'bg-primary border border-[#FFA500]' : 'bg-[#FFA500]'}`}
+                  textStyles={isFollowing ? 'text-white' : 'text-black'}
+                />
               {hasAddress && (
                 <CustomButton
                   title="Directions"

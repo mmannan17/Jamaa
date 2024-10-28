@@ -93,6 +93,53 @@ const Provider = ( { children } ) => {
         return false;
       }
     };
+    const followMosque = async (mosqueId) => {
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/mosque/${mosqueId}/follow/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log(response)
+        if (!response.ok) {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.error || "Failed to follow mosque.");
+          return false;
+        }
+  
+  
+        Alert.alert("Success", "Mosque followed successfully.");
+        return true;
+      } catch (error) {
+        Alert.alert("Error", "Failed to follow mosque.");
+        return false;
+      }
+    };
+  
+    const unfollowMosque = async (mosqueId) => {
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/mosque/${mosqueId}/follow/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.error || "Failed to unfollow mosque.");
+          return false;
+        }
+  
+  
+        Alert.alert("Success", "Mosque unfollowed successfully.");
+        return true;
+      } catch (error) {
+        Alert.alert("Error", "Failed to unfollow mosque.");
+        return false;
+      }
+    };
     
 
     const logout = async () => {
@@ -449,6 +496,7 @@ const Provider = ( { children } ) => {
     }
   };
 
+
     const globalContext = {
         isLoggedIn,
         setIsLoggedIn,
@@ -469,6 +517,8 @@ const Provider = ( { children } ) => {
         getNearbyMosques,
         nearbyMosques,
         editMosque,
+        followMosque,
+        unfollowMosque
     };
 
     return (
