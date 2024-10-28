@@ -106,7 +106,7 @@ const Profile = () => {
             <View className="w-full items-center mt-6 mb-12 px-4">
               <TouchableOpacity
                 className="w-full items-end mb-4"
-                onPress={() => router.push('/edit/settings')} // Replace '/settings' with your actual settings route if different
+                onPress={() => router.push('/edit/settings')}
               >
                 <Feather name="settings" size={28} color="white" />
               </TouchableOpacity>
@@ -117,11 +117,19 @@ const Profile = () => {
                   resizeMode="cover"
                 />
               </View>
-              
               <Text className="text-xl font-psemibold text-white mb-4">
                 {user ? user.username : 'User'}
               </Text>
-
+              {/* Edit Profile Button for Mosques */}
+              <CustomButton
+                title="Edit Profile"
+                handlePress={() => {
+                  // Add logic to navigate to the edit profile screen
+                  router.push('/edit/editMosque'); // Replace with your actual edit profile route
+                }}
+                containerStyles="min-h-[45px] w-2/4 mb-4 bg-secondary"
+                textStyles="text-base"
+              />
               <View className="flex-row justify-center w-full">
                 {hasAddress && (
                   <CustomButton
@@ -140,7 +148,6 @@ const Profile = () => {
                   />
                 )}
               </View>
-
               <View className="w-full mt-6">
                 <TimeTable 
                   mosque={{

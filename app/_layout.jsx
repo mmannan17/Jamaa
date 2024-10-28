@@ -22,6 +22,7 @@ const RootLayoutNav = () => {
       <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
       <Stack.Screen name="mosque/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="edit/settings" options={{ headerShown: false }} />
+      <Stack.Screen name="edit/editMosque" options={{ headerShown: false }} />
     </Stack>
   );
 };

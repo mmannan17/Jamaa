@@ -25,7 +25,7 @@ const Explore = () => {
       setFilteredMosques(nearbyMosques); // Show nearby mosques if search is empty
     } else {
       const filtered = mosques.filter(mosque =>
-        mosque.mosque.mosquename.toLowerCase().startsWith(search.toLowerCase())
+        mosque.mosque?.mosquename.toLowerCase().startsWith(search.toLowerCase())
       );
       console.log(filtered);
       setFilteredMosques(filtered);

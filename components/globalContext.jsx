@@ -56,7 +56,42 @@ const Provider = ( { children } ) => {
         throw error;
       }
     };
-  
+    const editMosque = async (mosqueData) => {
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/edit_mosque/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(mosqueData),
+        });
+    
+        console.log(response);
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.error || "Failed to update mosque profile.");
+          return false;
+        }
+    
+        const data = await response.json();
+    
+        // Update the user’s mosque info locally after a successful response
+        setUser((prevUser) => ({
+          ...prevUser,
+          mosque: {
+            ...prevUser.mosque,
+            ...mosqueData,
+          },
+        }));
+    
+        return true;
+      } catch (error) {
+        Alert.alert("Error", "Failed to update mosque profile.");
+        return false;
+      }
+    };
+    
 
     const logout = async () => {
         await AsyncStorage.multiRemove(['authToken', 'refreshToken', 'userData']);
@@ -431,6 +466,7 @@ const Provider = ( { children } ) => {
         getUserLocation, 
         getNearbyMosques,
         nearbyMosques,
+        editMosque,
     };
 
     return (
