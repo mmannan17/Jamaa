@@ -17,7 +17,6 @@ const Profile = () => {
   const [selectedPostId, setSelectedPostId] = useState(null);
   const router = useRouter(); 
 
-
   useEffect(() => {
     const fetchMosquePosts = async () => {
       if (user && user.mosque && user.mosque.mosquename && user.role === 'mosque') {
@@ -29,25 +28,6 @@ const Profile = () => {
     fetchMosquePosts();
   }, [user]);
 
-  const openMap = (address) => {
-    const encodedAddress = encodeURIComponent(address);
-    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
-    const url = Platform.select({
-      ios: `${scheme}${encodedAddress}`,
-      android: `${scheme}${encodedAddress}`
-    });
-
-    Linking.openURL(url).catch((err) => {
-      Alert.alert('Error', 'Unable to open map application.');
-    });
-  };
-
-  const openEmail = (email) => {
-    Linking.openURL(`mailto:${email}`).catch((err) => {
-      Alert.alert('Error', 'Unable to open email application.');
-    });
-  };
-
   const openMenu = (postId) => {
     setSelectedPostId(postId);
     setModalVisible(true);
@@ -57,21 +37,15 @@ const Profile = () => {
     if (selectedPostId) {
       const success = await deletePost(selectedPostId);
       if (success) {
-        // Refresh the posts
         if (user && user.mosque && user.mosque.mosquename) {
           await getMosquePosts(user.mosque.mosquename);
         }
       } else {
-        // Handle deletion failure
         Alert.alert('Error', 'Failed to delete the post. Please try again.');
       }
     }
     setModalVisible(false);
   };
-
-
-  const hasAddress = user?.mosque?.address;
-  const hasEmail = user?.mosque?.email;
 
   if (isLoading) {
     return (
@@ -120,34 +94,22 @@ const Profile = () => {
               <Text className="text-xl font-psemibold text-white mb-4">
                 {user ? user.username : 'User'}
               </Text>
-              {/* Edit Profile Button for Mosques */}
-              <CustomButton
-                title="Edit Profile"
-                handlePress={() => {
-                  // Add logic to navigate to the edit profile screen
-                  router.push('/edit/editMosque'); // Replace with your actual edit profile route
-                }}
-                containerStyles="min-h-[45px] w-2/4 mb-4 bg-secondary"
-                textStyles="text-base"
-              />
-              <View className="flex-row justify-center w-full">
-                {hasAddress && (
-                  <CustomButton
-                    title="Directions"
-                    handlePress={() => openMap(user.mosque.address)}
-                    containerStyles={`min-h-[45px] ${hasEmail ? 'flex-1 mr-2' : 'w-3/4'}`}
-                    textStyles="text-base"
-                  />
-                )}
-                {hasEmail && (
-                  <CustomButton
-                    title="Email"
-                    handlePress={() => openEmail(user.mosque.email)}
-                    containerStyles={`min-h-[45px] ${hasAddress ? 'flex-1 ml-2' : 'w-3/4'}`}
-                    textStyles="text-base"
-                  />
-                )}
+              
+              <View className="flex-row justify-center w-full mb-4">
+                <CustomButton
+                  title="Edit Profile"
+                  handlePress={() => router.push('/edit/editMosque')}
+                  containerStyles="min-h-[45px] flex-1 mr-2 bg-secondary"
+                  textStyles="text-base"
+                />
+                <CustomButton
+                  title="Edit Prayer Times"
+                  handlePress={() => router.push('/edit/prayerTimes')}
+                  containerStyles="min-h-[45px] flex-1 ml-2 bg-secondary"
+                  textStyles="text-base"
+                />
               </View>
+
               <View className="w-full mt-6">
                 <TimeTable 
                   mosque={{
@@ -201,12 +163,12 @@ const Profile = () => {
       <SafeAreaView className="bg-primary h-full">
         <View className="flex-1 items-center">
           <View className="w-full items-center mt-6 mb-12 px-4">
-          <TouchableOpacity
-            className="w-full items-end mb-4"
-            onPress={() => router.push('/edit/settings')} // Replace '/settings' with your actual settings route if different
-          >
-            <Feather name="settings" size={28} color="white" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="w-full items-end mb-4"
+              onPress={() => router.push('/edit/settings')}
+            >
+              <Feather name="settings" size={28} color="white" />
+            </TouchableOpacity>
   
             <View className="w-32 h-32 border-2 border-secondary rounded-full justify-center items-center overflow-hidden mb-4">
               <Image
@@ -220,28 +182,8 @@ const Profile = () => {
               {user ? user.username : 'User'}
             </Text>
   
-            <View className="flex-row justify-center w-full">
-              {hasAddress && (
-                <CustomButton
-                  title="Directions"
-                  handlePress={() => openMap(user.mosque.address)}
-                  containerStyles={`min-h-[45px] ${hasEmail ? 'flex-1 mr-2' : 'w-3/4'}`}
-                  textStyles="text-base"
-                />
-              )}
-              {hasEmail && (
-                <CustomButton
-                  title="Email"
-                  handlePress={() => openEmail(user.mosque.email)}
-                  containerStyles={`min-h-[45px] ${hasAddress ? 'flex-1 ml-2' : 'w-3/4'}`}
-                  textStyles="text-base"
-                />
-              )}
-            </View>
-          </View>
-  
-          <View className="flex-row justify-center w-full space-x-4 px-4">
-            <CustomButton
+            <View className="flex-row justify-center w-full space-x-4 px-4">
+              <CustomButton
                 title="Edit Profile"
                 handlePress={() => {
                   // Add logic to navigate to or open the edit profile screen/modal
@@ -249,21 +191,20 @@ const Profile = () => {
                 containerStyles="min-h-[50px] bg-secondary flex-1 mr-4"
                 textStyles="text-base"
               />
-            <CustomButton
-              title="Followed Mosques"
-              handlePress={() => {
-                // Add logic to navigate to the followed mosques list
-              }}
-              containerStyles="min-h-[50px] bg-secondary flex-1"
-              textStyles="text-base"
-            />
-  
+              <CustomButton
+                title="Followed Mosques"
+                handlePress={() => {
+                  // Add logic to navigate to the followed mosques list
+                }}
+                containerStyles="min-h-[50px] bg-secondary flex-1"
+                textStyles="text-base"
+              />
+            </View>
           </View>
         </View>
       </SafeAreaView>
     );
   }
-  
 };
 
 export default Profile;
