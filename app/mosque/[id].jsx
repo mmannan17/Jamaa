@@ -15,10 +15,10 @@ const MosqueProfile = () => {
   const { id } = useLocalSearchParams();
   const { mosques, getMosquePosts, mosquePosts } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
-  console.log("mosques", mosques);
   const mosque = mosques.find(m => m.mosque.mosque_id.toString() === id.toString());
 
   useEffect(() => {
+    console.log(mosque)
     const fetchMosquePosts = async () => {
       if (mosque && mosque.mosque && mosque.mosque.mosquename) {
         await getMosquePosts(mosque.mosque.mosquename);
@@ -87,7 +87,7 @@ const MosqueProfile = () => {
             </View>
             
             <Text className="text-xl font-psemibold text-white mb-4">
-              {mosque.username}
+              {mosque.mosque.mosquename}
             </Text>
 
             <View className="flex-row justify-center w-full">

@@ -11,10 +11,11 @@ const EditProfile = () => {
   const { user, editMosque } = useContext(Context);
 
   // Initialize state with mosque details
-  const [mosquename, setMosqueName] = useState(user?.mosque?.mosquename || '');
+  const [mosquename, setMosqueName] = useState(user?.mosque.mosquename || '');
   const [email, setEmail] = useState(user?.mosque?.email || '');
   const [address, setAddress] = useState(user?.mosque?.address || '');
   const router = useRouter();
+  console.log(user)
 
   const handleSave = async () => {
     if (mosquename.trim() === user?.mosque?.mosquename && email.trim() === user?.mosque?.email && address.trim() === user?.mosque?.address) {

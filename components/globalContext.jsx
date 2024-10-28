@@ -24,6 +24,7 @@ const Provider = ( { children } ) => {
 
 
     useEffect(() => {
+      console.log(user)
       if (user && user.username) {
         getUserLocation(user.username);
       }
@@ -58,7 +59,6 @@ const Provider = ( { children } ) => {
     };
     const editMosque = async (mosqueData) => {
       console.log(mosqueData)
-      console.log(user)
       try {
         const response = await authenticatedFetch(`${domain}/MosqueApp/edit_mosque/`, {
           method: 'PUT',
