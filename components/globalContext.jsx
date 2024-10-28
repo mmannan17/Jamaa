@@ -58,7 +58,6 @@ const Provider = ( { children } ) => {
       }
     };
     const editMosque = async (mosqueData) => {
-      console.log(mosqueData)
       try {
         const response = await authenticatedFetch(`${domain}/MosqueApp/edit_mosque/`, {
           method: 'PUT',
@@ -68,7 +67,6 @@ const Provider = ( { children } ) => {
           body: JSON.stringify(mosqueData),
         });
     
-        console.log(response);
     
         if (!response.ok) {
           const errorData = await response.json();
@@ -101,7 +99,6 @@ const Provider = ( { children } ) => {
             'Content-Type': 'application/json',
           },
         });
-        console.log(response)
         if (!response.ok) {
           const errorData = await response.json();
           Alert.alert("Error", errorData.error || "Failed to follow mosque.");
@@ -138,6 +135,73 @@ const Provider = ( { children } ) => {
       } catch (error) {
         Alert.alert("Error", "Failed to unfollow mosque.");
         return false;
+      }
+    };
+    const checkFollowingStatus = async (mosqueId) => {
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/user/${user.id}/following/`, {
+          method: 'GET',
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error checking follow status:", errorData.error || "Failed to fetch following list.");
+          return false;
+        }
+    
+        const data = await response.json();
+        if (data.mosque_ids.includes(parseInt(mosqueId))) {
+          return true;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        console.error("Error checking follow status:", error);
+        return false;
+      }
+    };
+    const fetchPrayerTimes = async (mosqueId) => {
+      try {
+        const response = await authenticatedFetch(
+          `${domain}/MosqueApp/display/${mosqueId}/prayertimes/`,
+          { method: 'GET' }
+        );
+        console.log(response)
+        if (response.ok) {
+          return await response.json();
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.error || "Failed to fetch prayer times.");
+          return null;
+        }
+      } catch (error) {
+        console.error('Error fetching prayer times:', error);
+        Alert.alert("Error", "Failed to fetch prayer times.");
+        return null;
+      }
+    };
+    const updatePrayerTimes = async (mosqueId, updatedTimes) => {
+      console.log(updatedTimes)
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/edit_prayer_time/${mosqueId}/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedTimes),
+        });
+        console.log(response)
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Updated Prayer Times:", data);
+          return data;
+        } else {
+          throw new Error("Failed to update prayer times");
+        }
+      } catch (error) {
+        console.error("Error updating prayer times:", error);
+        return null;
       }
     };
     
@@ -518,7 +582,10 @@ const Provider = ( { children } ) => {
         nearbyMosques,
         editMosque,
         followMosque,
-        unfollowMosque
+        unfollowMosque,
+        checkFollowingStatus,
+        fetchPrayerTimes,
+        updatePrayerTimes
     };
 
     return (

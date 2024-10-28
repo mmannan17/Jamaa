@@ -13,35 +13,45 @@ import TimeTable from '../../components/TimeTable';
 const MosqueProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { mosques, getMosquePosts, mosquePosts, followMosque, unfollowMosque } = useContext(Context);
+  const { mosques, getMosquePosts, mosquePosts, followMosque, unfollowMosque, checkFollowingStatus, fetchPrayerTimes } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const mosque = mosques.find(m => m.mosque.mosque_id.toString() === id.toString());
-
+  const [prayerTimes, setPrayerTimes] = useState(null);
   useEffect(() => {
-    console.log(mosque)
     const fetchMosquePosts = async () => {
       if (mosque && mosque.mosque && mosque.mosque.mosquename) {
         await getMosquePosts(mosque.mosque.mosquename);
       }
       setIsLoading(false);
     };
+    const fetchFollowStatus = async () => {
+      const status = await checkFollowingStatus(mosque.mosque.mosque_id);
+      setIsFollowing(status);
+    };
+    const loadPrayerTimes = async () => {
+      const data = await fetchPrayerTimes(mosque.mosque.mosque_id); // Use the global context function
+      console.log("data:", JSON.stringify(data, null, 2));
+
+      if (data) {
+        setPrayerTimes(data);
+      }
+    };
 
     fetchMosquePosts();
+    fetchFollowStatus();
+    loadPrayerTimes();
   }, [mosque]);
 
   const toggleFollow = async () => {
     try {
       if (isFollowing) {
-        const success = await unfollowMosque(mosque.mosque.mosque_id);
-        if (success) {
-          setIsFollowing(false);
-        }
+        await unfollowMosque(mosque.mosque.mosque_id);
+        setIsFollowing(false);
+       
       } else {
-        const success = await followMosque(mosque.mosque.mosque_id);
-        if (success) {
-          setIsFollowing(true);
-        }
+        await followMosque(mosque.mosque.mosque_id);
+        setIsFollowing(true);
       }
     } catch (error) {
       Alert.alert("Error", "Unable to update follow status.");
@@ -135,17 +145,19 @@ const MosqueProfile = () => {
             </View>
 
             <View className="w-full mt-6">
-              <TimeTable 
-                mosque={{
-                  name: mosque.mosque.mosquename,
-                  fajr: '05:30',
-                  sunrise: '06:00',
-                  dhuhr: '13:15',
-                  asr: '16:45',
-                  maghrib: '19:30',
-                  isha: '21:00',
-                }}
-              />
+              {prayerTimes ? (
+                <TimeTable
+                  mosque={{
+                    name: mosque.mosque.mosquename,
+                    fajr: prayerTimes.Iqama_Fajr,
+                    dhuhr: prayerTimes.Iqama_Zuhr,
+                    asr: prayerTimes.Iqama_Asr,
+                    maghrib: prayerTimes.Iqama_Maghrib,
+                    isha: prayerTimes.Iqama_Isha,
+                  }}/>
+              ) : (
+                <Text className="text-white text-center text-xl font-psemibold">Loading prayer times...</Text>
+              )}
             </View>
           </View>   
         )}

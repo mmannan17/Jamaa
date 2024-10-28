@@ -11,10 +11,11 @@ import { useRouter } from 'expo-router';
 import TimeTable from '../../components/TimeTable';
 
 const Profile = () => {
-  const { user, mosquePosts, getMosquePosts, logout, profile_pic, deletePost } = useContext(Context);
+  const { user, mosquePosts, getMosquePosts, logout, profile_pic, deletePost, fetchPrayerTimes } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
+  const [prayerTimes, setPrayerTimes] = useState(null);
   const router = useRouter(); 
 
   useEffect(() => {
@@ -24,8 +25,17 @@ const Profile = () => {
       }
       setIsLoading(false);
     };
+    const loadPrayerTimes = async () => {
+      const data = await fetchPrayerTimes(user.mosque.mosque_id); // Use the global context function
+      console.log("data:", JSON.stringify(data, null, 2));
+
+      if (data) {
+        setPrayerTimes(data);
+      }
+    };
   
     fetchMosquePosts();
+    loadPrayerTimes();
   }, [user]);
 
   const openMenu = (postId) => {
@@ -111,18 +121,20 @@ const Profile = () => {
               </View>
 
               <View className="w-full mt-6">
-                <TimeTable 
+              {prayerTimes ? (
+                <TimeTable
                   mosque={{
                     name: user.mosque.mosquename,
-                    fajr: '05:30',
-                    sunrise: '06:00',
-                    dhuhr: '13:15',
-                    asr: '16:45',
-                    maghrib: '19:30',
-                    isha: '21:00',
-                  }}
-                />
-              </View>
+                    fajr: prayerTimes.Iqama_Fajr,
+                    dhuhr: prayerTimes.Iqama_Zuhr,
+                    asr: prayerTimes.Iqama_Asr,
+                    maghrib: prayerTimes.Iqama_Maghrib,
+                    isha: prayerTimes.Iqama_Isha,
+                  }}/>
+              ) : (
+                <Text className="text-white text-center text-xl font-psemibold">Loading prayer times...</Text>
+              )}
+            </View>
             </View>
           )}
           ListEmptyComponent={() => (
