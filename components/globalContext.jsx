@@ -57,6 +57,8 @@ const Provider = ( { children } ) => {
       }
     };
     const editMosque = async (mosqueData) => {
+      console.log(mosqueData)
+      console.log(user)
       try {
         const response = await authenticatedFetch(`${domain}/MosqueApp/edit_mosque/`, {
           method: 'PUT',

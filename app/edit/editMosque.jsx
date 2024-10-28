@@ -3,24 +3,32 @@ import { View, Text, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Context } from '../../components/globalContext';
-import FormField from '../../components/FormField';  // Using FormField for input consistency
+import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 
 const EditProfile = () => {
   const { user, editMosque } = useContext(Context);
-  const [username, setUsername] = useState(user?.username || '');
+
+  // Initialize state with mosque details
+  const [mosquename, setMosqueName] = useState(user?.mosque?.mosquename || '');
   const [email, setEmail] = useState(user?.mosque?.email || '');
   const [address, setAddress] = useState(user?.mosque?.address || '');
   const router = useRouter();
 
   const handleSave = async () => {
-    if (!username.trim() || !email.trim() || !address.trim()) {
+    if (mosquename.trim() === user?.mosque?.mosquename && email.trim() === user?.mosque?.email && address.trim() === user?.mosque?.address) {
+      Alert.alert("Try again", "No changes made.");
+      return;
+    }
+    // Ensure all fields are filled out
+    if (!mosquename.trim() || !email.trim() || !address.trim()) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
 
-    const success = await editMosque({ username, email, address });
+    // Attempt to update the mosque profile
+    const success = await editMosque({ mosquename, email, address });
     if (success) {
       Alert.alert("Success", "Profile updated successfully.");
       router.back();
@@ -43,12 +51,12 @@ const EditProfile = () => {
         <View className="w-full justify-start min-h-[75vh] px-4 mt-2">
           <Text className="text-2xl text-white font-psemibold text-center mb-4">Edit Profile</Text>
 
-          {/* Username Field */}
+          {/* Mosque Name Field */}
           <FormField 
-            title="Username"
-            value={username}
-            handleChangeText={setUsername}
-            placeholder="Enter Username"
+            title="Mosque Name"
+            value={mosquename}
+            handleChangeText={setMosqueName}
+            placeholder="Enter Mosque Name"
             otherStyles="mt-4"
           />
 
@@ -75,7 +83,7 @@ const EditProfile = () => {
           <CustomButton
             title="Save Changes"
             handlePress={handleSave}
-            containerStyles="mt-7 p-4"
+            containerStyles="mt-7 p-4 bg-secondary"
             textStyles="text-black text-lg font-psemibold"
           />
         </View>
