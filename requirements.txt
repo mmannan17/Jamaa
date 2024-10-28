@@ -45,3 +45,10 @@ pywin32==306; sys_platform == 'win32'
 requests==2.25.1
 celery==5.2.3
 django-cors-headers
+boto3
+django-storages
+openai
+pytesseract
+Pillow
+openpyxl
+pandas

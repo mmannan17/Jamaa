@@ -290,7 +290,7 @@ class LikePostView(APIView):
         return Response({'status': 'Post unliked'}, status=status.HTTP_200_OK)
 
 
-# views.py
+
 import time
 import logging
 from django.db.models import Q
@@ -300,7 +300,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Mosque
 from .serializers import MosqueSerializer
-from .utils import get_grid, haversine  # Importing functions from utils.py
+from .utils import get_grid, haversine  
 
 logger = logging.getLogger(__name__)
 
@@ -521,7 +521,7 @@ class NearbyEventsView(APIView):
         mosques_response = nearby_mosques_view.get(request).data
 
         # Extract mosque IDs from the response
-        mosque_ids = [mosque['id'] for mosque in mosques_response]
+        mosque_ids = [mosque['mosque_id'] for mosque in mosques_response]
 
         # Fetch events for the nearby mosques
         events = Events.objects.filter(mosque_id__in=mosque_ids).order_by('event_date')
@@ -576,7 +576,7 @@ class SavePostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user  # The logged-in user who created the post
+        user = request.user  # logged-in user who created the post
         data = request.data
 
         # Get the mosque by mosque_id or name
@@ -729,12 +729,15 @@ class DeleteEventView(APIView):
 
 
 logger = logging.getLogger(__name__)
+import datetime
 
 class PrayerTimeUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logger.info(f"User {request.user} attempting to upload prayer times")
+        
+        
 
         excel_file = request.FILES.get('file')
         if not excel_file:
@@ -775,6 +778,11 @@ class PrayerTimeUploadView(APIView):
         return df.to_dict(orient='records')
 
     def send_to_openai(self, data):
+
+
+        current_datetime = datetime.datetime.now()
+
+        year = current_datetime.year
         # Convert time objects to strings
         data = self.convert_time_to_string(data)
         
@@ -784,6 +792,8 @@ class PrayerTimeUploadView(APIView):
         prompt = (
             "Extract iqama times for each day from the following data and return them in a structured JSON format. "
             "Use the date as the key and include only the iqama times. Ensure the output is valid JSON:\n"
+            "store the prayer times in the order of the prayers fajr should be first then zhuhr then asr then maghreb then isha. "
+            f"the date key should be in the format {year}-%m-%d and use the current year we're in for the year section. "
             f"{json_data}"
         )
         response = client.chat.completions.create(
@@ -804,20 +814,95 @@ class PrayerTimeUploadView(APIView):
     def convert_time_to_string(self, data):
         for entry in data:
             for key, value in entry.items():
-                if isinstance(value, time):
+                if isinstance(value, datetime.time):
                     entry[key] = value.strftime("%H:%M")
         return data
 
 
 
-### get events for a specific mosque
+class DisplayFollowing(APIView):
+    def get(self, request, user_id):
+        try:
+           
+            following_list = Follow.objects.filter(user_id=user_id) 
+
+            
+            if not following_list.exists():
+                return Response({'error': 'No following found for this user.'}, status=status.HTTP_404_NOT_FOUND)
+
+            
+            mosques = [follow.mosque.mosque_id for follow in following_list]  
+            
+
+            return Response({"mosque_ids": mosques}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 
+class DisplayPrayers(APIView):
+    def get(self, request, mosque_id):
+        # Get the current date formatted as yyyy-mm-dd
+        formatted_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        try:
+            # Retrieve the mosque instance
+            mosque = Mosque.objects.get(mosque_id=mosque_id)  
+            
+            # Access the prayer_times field directly
+            prayer_times = mosque.prayer_times  # Assuming this is a dictionary
+            
+            # Debugging: Print the prayer_times to see its structure
+            print("Prayer Times:", prayer_times)  # This will show in your server logs
+            print("formatteddate:",formatted_date)
+            # Check if the formatted date exists in the prayer times
+            if formatted_date in prayer_times:
+                return Response(prayer_times[formatted_date], status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Prayer times not found for today.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Mosque.DoesNotExist:
+            return Response({'error': 'Mosque not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 
+class EditPrayerTime(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def put(self, request, mosque_id):
+        logger.info(f"User {request.user} attempting to edit prayer times for mosque {mosque_id}")
 
+        try:
+            mosque = Mosque.objects.get(mosque_id=mosque_id)
+        except Mosque.DoesNotExist:
+            return Response({'error': 'Mosque not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Get the date and prayer times from the request data
+        date = request.data.get('date')
+        new_prayer_times = request.data.get('prayer_times')
+
+        if not date or not new_prayer_times:
+            return Response({'error': 'Date and prayer times are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate date format
+        try:
+            datetime.datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the prayer times for the specified date
+        prayer_times = mosque.prayer_times or {}
+        existing_times = prayer_times.get(date, {})
+        
+        # Merge existing times with new times
+        updated_times = {**existing_times, **new_prayer_times}
+        prayer_times[date] = updated_times
+        mosque.prayer_times = prayer_times
+        mosque.save()
+
+        logger.info(f"Prayer times for {date} updated for mosque {mosque_id}")
+        return Response({'status': f'Prayer times for {date} updated successfully'}, status=status.HTTP_200_OK)
