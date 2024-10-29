@@ -10,11 +10,10 @@ const TimeTable = ({ mosque }) => {
       <View className="flex-row justify-between">
         <View className="flex-1 mr-2">
           <TimeRow label="Fajr" time={mosque.fajr} />
-          <TimeRow label="Sunrise" time={mosque.sunrise} />
           <TimeRow label="Dhuhr" time={mosque.dhuhr} />
+          <TimeRow label="Asr" time={mosque.asr} />
         </View>
         <View className="flex-1 ml-2">
-          <TimeRow label="Asr" time={mosque.asr} />
           <TimeRow label="Maghrib" time={mosque.maghrib} />
           <TimeRow label="Isha" time={mosque.isha} />
         </View>
