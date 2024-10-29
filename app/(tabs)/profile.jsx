@@ -26,11 +26,13 @@ const Profile = () => {
       setIsLoading(false);
     };
     const loadPrayerTimes = async () => {
-      const data = await fetchPrayerTimes(user.mosque.mosque_id); // Use the global context function
-      console.log("data:", JSON.stringify(data, null, 2));
+      if (user && user.mosque && user.mosque.mosque_id) {
+        const data = await fetchPrayerTimes(user.mosque.mosque_id); // Use the global context function
+            console.log("data:", JSON.stringify(data, null, 2));
 
-      if (data) {
-        setPrayerTimes(data);
+        if (data) {
+          setPrayerTimes(data);
+        }
       }
     };
   
@@ -195,19 +197,10 @@ const Profile = () => {
             </Text>
   
             <View className="flex-row justify-center w-full space-x-4 px-4">
-              <CustomButton
-                title="Edit Profile"
-                handlePress={() => {
-                  // Add logic to navigate to or open the edit profile screen/modal
-                }}
-                containerStyles="min-h-[50px] bg-secondary flex-1 mr-4"
-                textStyles="text-base"
-              />
+              
               <CustomButton
                 title="Followed Mosques"
-                handlePress={() => {
-                  // Add logic to navigate to the followed mosques list
-                }}
+                handlePress={() => router.push('/edit/followingScreen')}
                 containerStyles="min-h-[50px] bg-secondary flex-1"
                 textStyles="text-base"
               />

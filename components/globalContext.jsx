@@ -20,6 +20,8 @@ const Provider = ( { children } ) => {
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [isLocationShared, setIsLocationShared] = useState(false);
     const [nearbyMosques, setNearbyMosques] = useState([]);
+    const [followedMosques, setFollowedMosques] = useState([]); // New state for followed mosques
+
 
 
 
@@ -27,6 +29,7 @@ const Provider = ( { children } ) => {
       console.log(user)
       if (user && user.username) {
         getUserLocation(user.username);
+        getFollowedMosques();
       }
     }, [user]);
 
@@ -135,6 +138,26 @@ const Provider = ( { children } ) => {
       } catch (error) {
         Alert.alert("Error", "Failed to unfollow mosque.");
         return false;
+      }
+    };
+    const getFollowedMosques = async () => {
+      if (!user || !user.id) return;
+      try {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/user/${user.id}/following/`, {
+          method: 'GET',
+        });
+    
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data)
+          setFollowedMosques(data.mosque_ids);
+        } else {
+          throw new Error('Failed to fetch followed mosques');
+        }
+      } catch (error) {
+        console.error("Error fetching followed mosques:", error);
+        Alert.alert("Error", "Failed to fetch followed mosques.");
       }
     };
     const checkFollowingStatus = async (mosqueId) => {
@@ -585,7 +608,9 @@ const Provider = ( { children } ) => {
         unfollowMosque,
         checkFollowingStatus,
         fetchPrayerTimes,
-        updatePrayerTimes
+        updatePrayerTimes,
+        getFollowedMosques,
+        followedMosques,
     };
 
     return (

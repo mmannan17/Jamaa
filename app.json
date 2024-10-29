@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "The Masjid App",
-    "slug": "TheMasjidApp",
-    "scheme": "TheMasjidApp",
+    "name": "Jamaa",
+    "slug": "jamaa",
+    "scheme": "jamaa",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,6 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "bundleIdentifier": "com.jamaa.app",
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to provide personalized mosque-related features near you."
