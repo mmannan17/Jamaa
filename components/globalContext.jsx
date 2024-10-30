@@ -147,7 +147,7 @@ const Provider = ( { children } ) => {
           method: 'GET',
         });
     
-  
+        console.log(response)
         if (response.ok) {
           const data = await response.json();
           console.log(data)
@@ -157,7 +157,6 @@ const Provider = ( { children } ) => {
         }
       } catch (error) {
         console.error("Error fetching followed mosques:", error);
-        Alert.alert("Error", "Failed to fetch followed mosques.");
       }
     };
     const checkFollowingStatus = async (mosqueId) => {
