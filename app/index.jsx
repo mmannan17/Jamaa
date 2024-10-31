@@ -27,8 +27,7 @@ export default function LandingPage() {
             </Text>
           </View>
 
-          <Text className="text-sm font-pregular text-white mt-7 text-center mb-5">Where you can find all the masjids around you 
-          and find events nearby</Text>
+          <Text className="text-sm font-pregular text-white mt-7 text-center mb-5">Where you can stay connected with the Muslim Community</Text>
           
           <CustomButton
           title = "Sign Up/Sign In"
