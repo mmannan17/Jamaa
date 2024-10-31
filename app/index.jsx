@@ -15,32 +15,24 @@ export default function LandingPage() {
   return (
     <SafeAreaView className = 'bg-primary h-full'>
       <ScrollView contentContainerStyle = {{height: '100%'}}>
-        <View className =" w-full  items-center min-h-[85vh] px-4">
-          <Image
-            source = {images.logo}
-            className = "w-[130px] h-[84px]"
-            resizeMode = "contain"
-          />
+        <View className =" w-full  items-center min-h-[85vh] px-4 justify-center">
           <Image 
-          source={require('../assets/images/orangeMosque.png')}
+          source={images.logoLarge}
           className="max-w-[230px] w-full h-[300px]"
           resizeMode='contain'
           />
           <View className = "relative mt-5">
             <Text className = "text-3xl text-white font-bold text-center"> Welcome to
-            <Text className = "text-secondary-200"> Masjidy{"\n"}</Text>
+            <Text className = "text-secondary-200"> Jamaa{"\n"}</Text>
             </Text>
           </View>
 
-          <Text className="text-sm font-pregular text-white mt-7 text-center mb-5">Where you can find all the masjids around you 
-          and find events nearby</Text>
+          <Text className="text-sm font-pregular text-white mt-7 text-center mb-5">Where you can stay connected with the Muslim Community</Text>
           
           <CustomButton
           title = "Sign Up/Sign In"
           handlePress ={() => router.push('/sign-in')} 
           containerStyles="w-full mt-7"/>
-
-          <Link href='/home' className="text-white pt-5">Skip Sign-In</Link>
 
         </View>
       </ScrollView>
