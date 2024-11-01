@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Jamaa",
-    "slug": "jamaa",
-    "scheme": "jamaa",
+    "name": "Jamaah",
+    "slug": "jamaah",
+    "scheme": "jamaah",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
