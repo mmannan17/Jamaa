@@ -17,15 +17,15 @@ export default function LandingPage() {
       <ScrollView contentContainerStyle = {{height: '100%'}}>
         <View className =" w-full  items-center min-h-[85vh] px-4 justify-center">
           <Image 
-          source={images.logoLarge}
+          source={images.testLogoSmall}
           className="max-w-[230px] w-full h-[300px]"
           resizeMode='contain'
           />
-          <View className = "relative mt-5">
+          {/* <View className = "relative mt-5">
             <Text className = "text-3xl text-white font-bold text-center"> Welcome to
             <Text className = "text-secondary-200"> Jamaa{"\n"}</Text>
             </Text>
-          </View>
+          </View> */}
 
           <Text className="text-sm font-pregular text-white mt-7 text-center mb-5">Where you can stay connected with the Muslim Community</Text>
           

@@ -6,7 +6,7 @@ import TimeTable from "./TimeTable";
 const samplePinnedMosques = [
   {
     id: '1',
-    name: 'Masjid Al-Noor',
+    name: 'Masjid Umar',
     fajr: '05:30',
     sunrise: '06:00',
     dhuhr: '13:15',

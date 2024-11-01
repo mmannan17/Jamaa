@@ -52,10 +52,10 @@ const Home = () => {
               </Text>
             </View>
             
-            <View className="mt-1.5">
+            <View className="-mt- ">
               <Image 
-                source={images.logoSmall}
-                className="w-9 h-10"
+                source={images.croppedLogoSmall}
+                className="w-9 h-16"
                 resizemode='contain'
                 />
             </View>
