@@ -127,11 +127,11 @@ const Profile = () => {
                 <TimeTable
                   mosque={{
                     name: user.mosque.mosquename,
-                    fajr: prayerTimes.Iqama_Fajr,
-                    dhuhr: prayerTimes.Iqama_Zuhr,
-                    asr: prayerTimes.Iqama_Asr,
-                    maghrib: prayerTimes.Iqama_Maghrib,
-                    isha: prayerTimes.Iqama_Isha,
+                    fajr: prayerTimes.Fajr,
+                    dhuhr: prayerTimes.Zuhr,
+                    asr: prayerTimes.Asr,
+                    maghrib: prayerTimes.Maghrib,
+                    isha: prayerTimes.Isha,
                   }}/>
               ) : (
                 <Text className="text-white text-center text-xl font-psemibold">Loading prayer times...</Text>

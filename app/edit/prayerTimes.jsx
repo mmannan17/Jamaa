@@ -37,11 +37,11 @@ const PrayerTimes = () => {
   
     // Structure the prayerTimes object to match the backend expectations
     const formattedPrayerTimes = {
-      Iqama_Fajr: prayerTimes.Iqama_Fajr,
-      Iqama_Zuhr: prayerTimes.Iqama_Zuhr,
-      Iqama_Asr: prayerTimes.Iqama_Asr,
-      Iqama_Maghrib: prayerTimes.Iqama_Maghrib,
-      Iqama_Isha: prayerTimes.Iqama_Isha,
+      Iqama_Fajr: prayerTimes.Fajr,
+      Iqama_Zuhr: prayerTimes.Zuhr,
+      Iqama_Asr: prayerTimes.Asr,
+      Iqama_Maghrib: prayerTimes.Maghrib,
+      Iqama_Isha: prayerTimes.Isha,
     };
   
     // Call the updatePrayerTimes function and pass in both date and formatted prayer times
