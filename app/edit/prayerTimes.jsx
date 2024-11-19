@@ -81,11 +81,11 @@ const PrayerTimes = () => {
         <TimeTable
           mosque={{
             name: user.mosque.mosquename,
-            fajr: prayerTimes.Iqama_Fajr,
-            dhuhr: prayerTimes.Iqama_Zuhr,
-            asr: prayerTimes.Iqama_Asr,
-            maghrib: prayerTimes.Iqama_Maghrib,
-            isha: prayerTimes.Iqama_Isha,
+            fajr: prayerTimes.Fajr,
+            dhuhr: prayerTimes.Zuhr,
+            asr: prayerTimes.Asr,
+            maghrib: prayerTimes.Maghrib,
+            isha: prayerTimes.Isha,
           }}
         />
       </View>
