@@ -53,8 +53,10 @@ const SignUp = () => {
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
         <View className="w-full justify-center min-h-[15vh] px-4 my-6">
-          <Image source={images.testLogoSmall} resizeMode='contain' className="w-[115px] h-[115px]" />
-          <Text className="text-2xl text-white mt-10 font-psemibold">Register Your Masjid</Text>
+          <View className="w-full flex items-end">
+            <Image source={images.testLogoSmall} resizeMode='contain' className="w-[115px] h-[80px]" />
+          </View>
+          <Text className="text-2xl text-white font-psemibold">Register Your Masjid</Text>
 
           {error && (
             <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>
@@ -72,7 +74,7 @@ const SignUp = () => {
             title="Email"
             value={form.email}
             handleChangeText={(e) => setForm({ ...form, email: e })}
-            otherStyles="mt-7"
+            otherStyles="mt-5"
             keyboardType="email-address"
             placeholder="Enter Email for Login"
           />
@@ -81,7 +83,7 @@ const SignUp = () => {
             title="Password"
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
-            otherStyles="mt-7"
+            otherStyles="mt-5"
             secureTextEntry={true}
             placeholder="Enter Password"
           />
@@ -90,7 +92,7 @@ const SignUp = () => {
             title="Mosque Address"
             value={form.address}
             handleChangeText={(e) => setForm({ ...form, address: e })}
-            otherStyles="mt-7"
+            otherStyles="mt-5"
             placeholder="Enter Address"
           />
 
