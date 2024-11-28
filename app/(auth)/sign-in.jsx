@@ -37,10 +37,10 @@ const [isSubmitting, setisSubmitting] = useState(false);
   return (
     <SafeAreaView className ="bg-primary h-full">
      <ScrollView>
-      <View className="w-full justify-center min-h-[75vh] px-4 my-6">
-        <Image source = {images.logo}
-        resizeMode='contain' className="w-[115px] h-[35px]"/>
-        <Text className = "text-2xl text-white mt-10 font-psemibold">Log in to Masjidy</Text>
+      <View className="w-full justify-center min-h-[15vh] px-4 my-6">
+        <Image source = {images.testLogoSmall}
+        resizeMode='contain' className="w-[115px] h-[115px]"/>
+        <Text className = "text-2xl text-white mt-10 font-psemibold">Log in to Jamaa</Text>
         
         {error && (
           <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>

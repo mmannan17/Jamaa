@@ -7,6 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/mosque.jpg",
       "resizeMode": "contain",
@@ -37,8 +38,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "aaf40f4d-7ec6-4b71-ad4b-8d4a853ff2cd"
+        "projectId": "3615a212-11fd-4bb8-adb9-a7fb159e5978"
       }
-    }
+    },
+    "owner": "tameemtantawy"
   }
 }

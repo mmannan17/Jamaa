@@ -1,50 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FlatList, View } from "react-native";
 import * as Animatable from "react-native-animatable";
 import TimeTable from "./TimeTable";
-
-const samplePinnedMosques = [
-  {
-    id: '1',
-    name: 'Masjid Umar',
-    fajr: '05:30',
-    sunrise: '06:00',
-    dhuhr: '13:15',
-    asr: '16:45',
-    maghrib: '19:30',
-    isha: '21:00',
-  },
-  {
-    id: '2',
-    name: 'Islamic Center',
-    fajr: '05:15',
-    sunrise: '05:45',
-    dhuhr: '13:00',
-    asr: '16:30',
-    maghrib: '19:25',
-    isha: '20:45',
-  },
-  {
-    id: '3',
-    name: 'Masjid As-Salam',
-    fajr: '05:45',
-    sunrise: '06:15',
-    dhuhr: '13:30',
-    asr: '17:00',
-    maghrib: '19:35',
-    isha: '21:15',
-  },
-  {
-    id: '4',
-    name: 'Downtown Mosque',
-    fajr: '05:20',
-    sunrise: '05:50',
-    dhuhr: '13:10',
-    asr: '16:40',
-    maghrib: '19:28',
-    isha: '20:55',
-  },
-];
+import { Context } from "./globalContext";
 
 const zoomIn = {
   0: {
@@ -78,17 +36,78 @@ const PinnedMosqueItem = ({ activeItem, item, isSingleItem }) => {
   );
 };
 
-const PinnedMosquesCarousel = ({ pinnedMosques = samplePinnedMosques }) => {
-  const [activeItem, setActiveItem] = useState(pinnedMosques[0]?.id || null);
-  const isSingleItem = pinnedMosques.length === 1;
+const PinnedMosquesCarousel = () => {
+  const { followedMosques, mosques, fetchPrayerTimes } = useContext(Context);
+  const [activeItem, setActiveItem] = useState(null);
+  const [pinnedMosques, setPinnedMosques] = useState([]);
 
-  const viewableItemsChanged = ({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setActiveItem(viewableItems[0].item.id);
-    }
-  };
+  useEffect(() => {
+    const loadPrayerTimes = async () => {
+      try {
+        // Return early if no followed mosques
+        if (!followedMosques?.length) {
+          setPinnedMosques([]);
+          return;
+        }
 
-  return pinnedMosques.length > 0 ? (
+        // Get full mosque details for followed mosques
+        const followedMosqueDetails = followedMosques
+          .map(mosqueId => mosques.find(m => m.mosque?.mosque_id === mosqueId))
+          .filter(mosque => mosque !== undefined);
+
+        // Return if no valid mosque details found
+        if (!followedMosqueDetails.length) {
+          setPinnedMosques([]);
+          return;
+        }
+
+        // Fetch prayer times for each mosque
+        const mosquesWithPrayerTimes = await Promise.all(
+          followedMosqueDetails.map(async (mosque) => {
+            try {
+              const prayerTimes = await fetchPrayerTimes(mosque.mosque.mosque_id);
+              return {
+                id: mosque.mosque.mosque_id.toString(),
+                name: mosque.mosque.mosquename,
+                // Use prayer times if available, otherwise empty strings
+                fajr: prayerTimes?.Fajr || '',
+                dhuhr: prayerTimes?.Zuhr || '',
+                asr: prayerTimes?.Asr || '',
+                maghrib: prayerTimes?.Maghrib || '',
+                isha: prayerTimes?.Isha || '',
+              };
+            } catch (error) {
+              console.error(`Error fetching prayer times for mosque ${mosque.mosque.mosque_id}:`, error);
+              // Return mosque with empty prayer times
+              return {
+                id: mosque.mosque.mosque_id.toString(),
+                name: mosque.mosque.mosquename,
+                fajr: '',
+                dhuhr: '',
+                asr: '',
+                maghrib: '',
+                isha: '',
+              };
+            }
+          })
+        );
+        
+        setPinnedMosques(mosquesWithPrayerTimes);
+        if (mosquesWithPrayerTimes.length > 0) {
+          setActiveItem(mosquesWithPrayerTimes[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading prayer times:', error);
+        setPinnedMosques([]);
+      }
+    };
+
+    loadPrayerTimes();
+  }, [followedMosques, mosques]);
+
+  if (!pinnedMosques.length) return null;
+
+  return (
     <FlatList
       data={pinnedMosques}
       horizontal
@@ -97,17 +116,21 @@ const PinnedMosquesCarousel = ({ pinnedMosques = samplePinnedMosques }) => {
         <PinnedMosqueItem 
           activeItem={activeItem} 
           item={item} 
-          isSingleItem={isSingleItem}
+          isSingleItem={pinnedMosques.length === 1}
         />
       )}
-      onViewableItemsChanged={viewableItemsChanged}
+      onViewableItemsChanged={({ viewableItems }) => {
+        if (viewableItems.length > 0) {
+          setActiveItem(viewableItems[0].item.id);
+        }
+      }}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 70,
       }}
       contentContainerStyle={{ paddingHorizontal: 5 }}
       showsHorizontalScrollIndicator={false}
     />
-  ) : null;
+  );
 };
 
 export default PinnedMosquesCarousel;

@@ -193,12 +193,11 @@ const Provider = ( { children } ) => {
           return await response.json();
         } else {
           const errorData = await response.json();
-          Alert.alert("Error", errorData.error || "Failed to fetch prayer times.");
+          console.error(errorData)
           return null;
         }
       } catch (error) {
         console.error('Error fetching prayer times:', error);
-        Alert.alert("Error", "Failed to fetch prayer times.");
         return null;
       }
     };
