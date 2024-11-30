@@ -77,13 +77,7 @@ const Profile = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-primary">
-        <Text className="font-psemibold text-white text-2xl">Loading...</Text>
-      </View>
-    );
-  }
+  
 
   if (user && user.role === 'mosque') {
     return (
@@ -137,22 +131,18 @@ const Profile = () => {
               </View>
 
               <View className="w-full mt-6">
-                {prayerTimes ? (
+              
                   <TimeTable
                     mosque={{
-                      name: user.mosque.mosquename,
-                      fajr: prayerTimes.Fajr,
-                      dhuhr: prayerTimes.Zuhr,
-                      asr: prayerTimes.Asr,
-                      maghrib: prayerTimes.Maghrib,
-                      isha: prayerTimes.Isha,
+                      name: user.mosque.mosquename ? user.mosque.mosquename : 'N/A',
+                      fajr: prayerTimes?.Fajr ? prayerTimes.Fajr  : 'N/A',
+                      dhuhr: prayerTimes?.Zuhr ? prayerTimes.Zuhr : 'N/A',
+                      asr: prayerTimes?.Asr ? prayerTimes.Asr : 'N/A',
+                      maghrib: prayerTimes?.Maghrib ? prayerTimes.Maghrib : 'N/A',
+                      isha: prayerTimes?.Isha ? prayerTimes.Isha : 'N/A',
                     }}
                   />
-                ) : (
-                  <Text className="text-white text-center text-xl font-psemibold">
-                    Loading prayer times...
-                  </Text>
-                )}
+                
               </View>
             </View>
           )}

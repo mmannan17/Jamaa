@@ -145,19 +145,16 @@ const MosqueProfile = () => {
             </View>
 
             <View className="w-full mt-6">
-              {prayerTimes ? (
                 <TimeTable
                   mosque={{
-                    name: mosque.mosque.mosquename,
-                    fajr: prayerTimes.Fajr,
-                    dhuhr: prayerTimes.Zuhr,
-                    asr: prayerTimes.Asr,
-                    maghrib: prayerTimes.Maghrib,
-                    isha: prayerTimes.Isha,
-                  }}/>
-              ) : (
-                <Text className="text-white text-center text-xl font-psemibold">Loading prayer times...</Text>
-              )}
+                    name: mosque.mosque.mosquename ? mosque.mosque.mosquename : 'N/A',
+                    fajr: prayerTimes?.Fajr ? prayerTimes.Fajr  : 'N/A',
+                    dhuhr: prayerTimes?.Zuhr ? prayerTimes.Zuhr : 'N/A',
+                    asr: prayerTimes?.Asr ? prayerTimes.Asr : 'N/A',
+                    maghrib: prayerTimes?.Maghrib ? prayerTimes.Maghrib : 'N/A',
+                    isha: prayerTimes?.Isha ? prayerTimes.Isha : 'N/A',
+                  }}
+                  />
             </View>
           </View>   
         )}

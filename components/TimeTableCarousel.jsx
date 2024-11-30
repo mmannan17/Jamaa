@@ -70,11 +70,11 @@ const PinnedMosquesCarousel = () => {
                 id: mosque.mosque.mosque_id.toString(),
                 name: mosque.mosque.mosquename,
                 // Use prayer times if available, otherwise empty strings
-                fajr: prayerTimes?.Fajr || '',
-                dhuhr: prayerTimes?.Zuhr || '',
-                asr: prayerTimes?.Asr || '',
-                maghrib: prayerTimes?.Maghrib || '',
-                isha: prayerTimes?.Isha || '',
+                fajr: prayerTimes?.Fajr || 'N/A',
+                dhuhr: prayerTimes?.Zuhr || 'N/A',
+                asr: prayerTimes?.Asr || 'N/A',
+                maghrib: prayerTimes?.Maghrib || 'N/A',
+                isha: prayerTimes?.Isha || 'N/A',
               };
             } catch (error) {
               console.error(`Error fetching prayer times for mosque ${mosque.mosque.mosque_id}:`, error);
