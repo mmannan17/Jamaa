@@ -17,13 +17,21 @@ const PrayerTimes = () => {
       const data = await fetchPrayerTimes(user.mosque.mosque_id);
       console.log("data:", JSON.stringify(data, null, 2));
 
-      if (data) {
-        setPrayerTimes(data);
-      }
+    
+      // Set each prayer time to 'N/A' if it's missing or null
+      setPrayerTimes({
+        Fajr: data?.Fajr || 'N/A',
+        Zuhr: data?.Zuhr || 'N/A',
+        Asr: data?.Asr || 'N/A',
+        Maghrib: data?.Maghrib || 'N/A',
+        Isha: data?.Isha || 'N/A',
+      });
+     
     };
 
     loadPrayerTimes();
   }, [user]);
+
 
   const handleEditToggle = () => setIsEditing(!isEditing);
 
@@ -37,11 +45,11 @@ const PrayerTimes = () => {
   
     // Structure the prayerTimes object to match the backend expectations
     const formattedPrayerTimes = {
-      Iqama_Fajr: prayerTimes.Fajr,
-      Iqama_Zuhr: prayerTimes.Zuhr,
-      Iqama_Asr: prayerTimes.Asr,
-      Iqama_Maghrib: prayerTimes.Maghrib,
-      Iqama_Isha: prayerTimes.Isha,
+      Fajr: prayerTimes?.Fajr,
+      Zuhr: prayerTimes?.Zuhr,
+      Asr: prayerTimes?.Asr,
+      Maghrib: prayerTimes?.Maghrib,
+      Isha: prayerTimes?.Isha,
     };
   
     // Call the updatePrayerTimes function and pass in both date and formatted prayer times
@@ -70,7 +78,7 @@ const PrayerTimes = () => {
           <View key={time} className="mb-5">
             <Text className="text-gray-300">{time.replace('_', ' ')}:</Text>
             <TextInput
-              value={value}
+              value={value}  // Ensure that if value is falsy, 'N/A' is shown
               onChangeText={(text) => handleInputChange(time, text)}
               className="border-b-2 border-secondary text-white"
             />
@@ -80,12 +88,12 @@ const PrayerTimes = () => {
         <View>
         <TimeTable
           mosque={{
-            name: user.mosque.mosquename,
-            fajr: prayerTimes.Fajr,
-            dhuhr: prayerTimes.Zuhr,
-            asr: prayerTimes.Asr,
-            maghrib: prayerTimes.Maghrib,
-            isha: prayerTimes.Isha,
+            name: user.mosque.mosquename ? user.mosque.mosquename : 'N/A',
+            fajr: prayerTimes?.Fajr ? prayerTimes.Fajr  : 'N/A',
+            dhuhr: prayerTimes?.Zuhr ? prayerTimes.Zuhr : 'N/A',
+            asr: prayerTimes?.Asr ? prayerTimes.Asr : 'N/A',
+            maghrib: prayerTimes?.Maghrib ? prayerTimes.Maghrib : 'N/A',
+            isha: prayerTimes?.Isha ? prayerTimes.Isha : 'N/A',
           }}
         />
       </View>
