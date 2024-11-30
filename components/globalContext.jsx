@@ -194,7 +194,7 @@ const Provider = ( { children } ) => {
         });
     
         // Make the POST request to upload the file
-        const response = await authenticatedFetch(`${domain}/MosqueApp/upload_prayer_times/${mosqueId}/`, {
+        const response = await authenticatedFetch(`${domain}/MosqueApp/upload_prayer_times/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data', // Make sure this is set to handle file uploads
@@ -203,6 +203,7 @@ const Provider = ( { children } ) => {
         });
     
         // Check if the response is successful
+        console.log(response)
         if (response.ok) {
           const data = await response.json();
           console.log("Prayer times uploaded successfully:", data);
