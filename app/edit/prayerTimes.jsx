@@ -6,11 +6,15 @@ import { router } from 'expo-router'; // Import router from expo-router
 import { Context } from '../../components/globalContext';
 import TimeTable from '../../components/TimeTable';
 import CustomButton from '../../components/CustomButton';
+import * as DocumentPicker from 'expo-document-picker';
+
 
 const PrayerTimes = () => {
-  const { fetchPrayerTimes, updatePrayerTimes, user } = useContext(Context);
+  const { fetchPrayerTimes, updatePrayerTimes, uploadPrayerTimes, user } = useContext(Context);
   const [prayerTimes, setPrayerTimes] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
 
   useEffect(() => {
     const loadPrayerTimes = async () => {
@@ -63,6 +67,16 @@ const PrayerTimes = () => {
     }
   };
   
+  const handleUpload = async () => {
+    try {
+      console.log("Testing document picker...");
+      const res = await DocumentPicker.pick();
+      console.log("File selected:", res);
+    } catch (err) {
+      console.error("Error during file selection:", err);
+    }
+  };
+  
 
   return (
     <SafeAreaView className="flex-1 bg-primary p-4">
@@ -99,11 +113,22 @@ const PrayerTimes = () => {
       </View>
       )}
 
+      
+
       <CustomButton
         title={isEditing ? "Save Changes" : "Edit Times"}
         handlePress={isEditing ? handleSave : handleEditToggle}
         containerStyles="mt-4"
       />
+
+      {!isEditing && (
+        <CustomButton
+          title={isUploading ? "Uploading..." : "Upload Prayer Times"}
+          handlePress={handleUpload}
+          containerStyles="mt-4"
+          disabled={isUploading}
+        />
+      )}
     </SafeAreaView>
   );
 };

@@ -182,6 +182,41 @@ const Provider = ( { children } ) => {
         return false;
       }
     };
+
+    const uploadPrayerTimes = async (mosqueId, fileUri) => {
+      try {
+        // Create FormData for sending the file
+        const formData = new FormData();
+        formData.append('file', {
+          uri: fileUri,
+          name: 'prayer_times.xlsx', // Set the name for the file, can be dynamic
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+    
+        // Make the POST request to upload the file
+        const response = await authenticatedFetch(`${domain}/MosqueApp/upload_prayer_times/${mosqueId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data', // Make sure this is set to handle file uploads
+          },
+          body: formData,
+        });
+    
+        // Check if the response is successful
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Prayer times uploaded successfully:", data);
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Error uploading prayer times:", errorData);
+          return null;
+        }
+      } catch (error) {
+        console.error('Error uploading prayer times:', error);
+        return null;
+      }
+    };
     const fetchPrayerTimes = async (mosqueId) => {
       try {
         const response = await authenticatedFetch(
@@ -609,6 +644,7 @@ const Provider = ( { children } ) => {
         updatePrayerTimes,
         getFollowedMosques,
         followedMosques,
+        uploadPrayerTimes,
     };
 
     return (
