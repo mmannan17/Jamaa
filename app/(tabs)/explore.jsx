@@ -17,6 +17,7 @@ const Explore = () => {
   const screenWidth = Dimensions.get('window').width;
   const [inputWidth] = useState(new Animated.Value(screenWidth - 20));
   const [arrowOpacity] = useState(new Animated.Value(0));
+  const [marginLeft] = useState(new Animated.Value(0)); // Animate marginLeft
 
   const searchInputRef = useRef(null);
 
@@ -47,7 +48,13 @@ const Explore = () => {
     setIsFocused(true);
 
     Animated.timing(inputWidth, {
-      toValue: screenWidth * 0.85,
+      toValue: screenWidth * 0.85, // Shrink from both sides
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+
+    Animated.timing(marginLeft, {
+      toValue: 25, // Set marginLeft when focused
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -63,7 +70,13 @@ const Explore = () => {
     setIsFocused(false);
 
     Animated.timing(inputWidth, {
-      toValue: screenWidth - 20,
+      toValue: screenWidth - 20, // Expand from both sides
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+
+    Animated.timing(marginLeft, {
+      toValue: 0, // Revert marginLeft when not focused
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -93,7 +106,7 @@ const Explore = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View style={{ width: inputWidth, marginLeft: isFocused ? 30 : 0 }}>
+        <Animated.View style={{ width: inputWidth, marginLeft: marginLeft }}>
           <NewSearchInput 
             ref={searchInputRef}
             query={search}
@@ -106,26 +119,25 @@ const Explore = () => {
       {/* Conditionally render filtered mosques or nearby events */}
       {isFocused ? (
         <FlatList
-        data={filteredMosques}
-        keyExtractor={(item, index) => (item.mosque_id ? item.mosque_id.toString() : index.toString())}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleMosquePress(item)}
-            className="bg-black-100 p-4 m-2 rounded-lg"
-          >
-            <Text className="text-white text-lg font-psemibold">{item.mosquename ||  item.mosque.mosquename}</Text>
-            <Text className="text-gray-300 mt-1">
-              {item.distance_miles ? `Distance: ${item.distance_miles} Miles` : `Address: ${item.mosque?.address}`}
-            </Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() => (
-          <View className="flex-1 justify-center items-center mt-10">
-            <Text className="text-white text-lg">No mosques found nearby</Text>
-          </View>
-        )}
-      />
-      
+          data={filteredMosques}
+          keyExtractor={(item, index) => (item.mosque_id ? item.mosque_id.toString() : index.toString())}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleMosquePress(item)}
+              className="bg-black-100 p-4 m-2 rounded-lg"
+            >
+              <Text className="text-white text-lg font-psemibold">{item.mosquename ||  item.mosque.mosquename}</Text>
+              <Text className="text-gray-300 mt-1">
+                {item.distance_miles ? `Distance: ${item.distance_miles} Miles` : `Address: ${item.mosque?.address}`}
+              </Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={() => (
+            <View className="flex-1 justify-center items-center mt-10">
+              <Text className="text-white text-lg">No mosques found nearby</Text>
+            </View>
+          )}
+        />
       ) : (
         <FlatList
           data={nearbyEvents}
