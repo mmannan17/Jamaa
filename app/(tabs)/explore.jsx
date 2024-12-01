@@ -140,23 +140,28 @@ const Explore = () => {
         />
       ) : (
         <FlatList
-          data={nearbyEvents}
-          keyExtractor={(item) => item.event_id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => router.push(`/event/${item.event_id}`)}
-              className="bg-black-100 p-4 m-2 rounded-lg"
-            >
-              <Text className="text-white text-lg font-psemibold">Event: {item.title}</Text>
-              <Text className="text-gray-300 mt-1">Date: {item.date}</Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={() => (
-            <View className="flex-1 justify-center items-center mt-10">
-              <Text className="text-white text-lg">No nearby events found</Text>
-            </View>
-          )}
-        />
+        data={nearbyEvents}
+        keyExtractor={(item) => item.event_id.toString()}
+        renderItem={({ item }) => (
+          <PostCard
+            post={{
+              title: item.title,
+              posttype: item.type, // Assuming there's a type for events
+              content: item.description, // Assuming event has a description
+              media_file: item.media_file,
+              timestamp: item.timestamp,
+              mosque: item.mosque, // Assuming the event is linked to a mosque
+              media_type: item.media_type,
+              profile_pic: item.profile_pic, // Assuming you want to show a profile pic related to event creator
+            }}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View className="flex-1 justify-center items-center mt-10">
+            <Text className="text-white text-lg">No nearby events found</Text>
+          </View>
+        )}
+      />
       )}
     </SafeAreaView>
   );

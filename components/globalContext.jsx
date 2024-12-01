@@ -21,6 +21,8 @@ const Provider = ( { children } ) => {
     const [isLocationShared, setIsLocationShared] = useState(false);
     const [nearbyMosques, setNearbyMosques] = useState([]);
     const [followedMosques, setFollowedMosques] = useState([]); // New state for followed mosques
+    const [nearbyEvents, setNearbyEvents] = useState([]);
+
 
 
 
@@ -58,6 +60,35 @@ const Provider = ( { children } ) => {
       } catch (error) {
         console.error('Error logging in:', error);
         throw error;
+      }
+    };
+
+    const getNearbyEvents = async () => {
+      try {
+        const location = await getUserLocation(user.username); // Get the user's location
+        if (!location || !location.latitude || !location.longitude) {
+          throw new Error('Unable to get user location');
+        }
+    
+        const response = await authenticatedFetch(
+          `${domain}/MosqueApp/events/`,
+          {
+            method: 'GET',
+          }
+        );
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.error || "Failed to fetch nearby events.");
+          return;
+        }
+    
+        const events = await response.json();
+        console.log(events); // For debugging purposes
+        setNearbyEvents(events); // Store events in the state
+      } catch (error) {
+        console.error('Error fetching nearby events:', error);
+        Alert.alert("Error", "An error occurred while fetching nearby events.");
       }
     };
     const editMosque = async (mosqueData) => {
@@ -646,6 +677,8 @@ const Provider = ( { children } ) => {
         getFollowedMosques,
         followedMosques,
         uploadPrayerTimes,
+        getNearbyEvents,
+        nearbyEvents,
     };
 
     return (
