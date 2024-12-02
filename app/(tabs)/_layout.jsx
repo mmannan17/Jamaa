@@ -1,113 +1,121 @@
 import { View, Text, Image } from 'react-native';
-import {Tabs, Redirect} from 'expo-router';
-import {icons} from '../../constants'
+import { Tabs } from 'expo-router';
+import { icons } from '../../constants';
 import { StatusBar } from 'expo-status-bar';
 
-
-
-const TabIcon = ({icon, color, name, focused}) => {
-  return (
-    <View className = 'items-center justify-center gap-2'>
-      <Image
-        source = {icon}
-        resizeMode = "contain"
-        tintColor = {color}
-        className="w-5 h-5"
-      />
-      <Text className={`${focused ? 'font-psemibold': 'font-pregular'} test-xs color-white`}>
-        {name}
-      </Text>
-    </View>
-  )
-}
 const TabsLayout = () => {
   return (
     <>
-    <StatusBar backgroundColor='#161622' style='light'/>
-      <Tabs screenOptions = {{
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: '#FFA001',
-        tabBarInactiveTintColor: '#CDCDE0',
-        tabBarStyle: {
-          backgroundColor: '#161622',
-          borderTopWidth: 1,
-          borderTopColor: '#232533',
-          height: 90
-        }
+      <StatusBar backgroundColor='#161622' style='light'/>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: '#161622',
+            borderTopWidth: 1,
+            borderTopColor: '#232533',
+            height: 95,
+            paddingBottom: 10,
+            paddingTop: 5,
+            position: 'absolute',
+            bottom: 0,
+          },
+          tabBarActiveTintColor: '#FFA001',
+          tabBarInactiveTintColor: '#CDCDE0',
+        }}
+      >
+        <Tabs.Screen 
+          name="home"
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs text-white mt-2`}>
+                Home
+              </Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={icons.home}
+                style={{ width: 24, height: 24, tintColor: color }}
+                resizeMode="contain"
+              />
+            ),
+          }}
+        />
 
-      }}>
-        <Tabs.Screen name ="home"
-      options = {{
-        title: 'Home',
-        headerShown: false,
-        tabBarIcon: ({color, focused}) => (
-          <TabIcon
-            icon = {icons.home}
-            color = {color}
-            name = "Home"
-            focused = {focused}
-            />
-        )
-      }} />
+        <Tabs.Screen 
+          name="explore"
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs text-white mt-2`}>
+                Explore
+              </Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={icons.search}
+                style={{ width: 24, height: 24, tintColor: color }}
+                resizeMode="contain"
+              />
+            ),
+          }}
+        />
 
-      <Tabs.Screen name ="explore"
-      options = {{
-        title: 'Explore',
-        headerShown: false,
-        tabBarIcon: ({color, focused}) => (
-          <TabIcon
-            icon = {icons.search}
-            color = {color}
-            name = "Explore"
-            focused = {focused}
-            />
-        )
-      }} />
+        <Tabs.Screen 
+          name="create"
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs text-white mt-2`}>
+                Create
+              </Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={icons.plus}
+                style={{ width: 24, height: 24, tintColor: color }}
+                resizeMode="contain"
+              />
+            ),
+          }}
+        />
 
-<Tabs.Screen name ="create"
-      options = {{
-        title: 'Create',
-        headerShown: false,
-        tabBarIcon: ({color, focused}) => (
-          <TabIcon
-            icon = {icons.plus}
-            color = {color}
-            name = "Create"
-            focused = {focused}
-            />
-        )
-      }} />
+        <Tabs.Screen 
+          name="bookmark"
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs text-white mt-2`}>
+                Bookmark
+              </Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={icons.bookmark}
+                style={{ width: 24, height: 24, tintColor: color }}
+                resizeMode="contain"
+              />
+            ),
+          }}
+        />
 
-      <Tabs.Screen name ="bookmark"
-      options = {{
-        title: 'Bookmark',
-        headerShown: false,
-        tabBarIcon: ({color, focused}) => (
-          <TabIcon
-            icon = {icons.bookmark}
-            color = {color}
-            name = "Bookmark"
-            focused = {focused}
-            />
-        )
-      }} />
-
-<Tabs.Screen name ="profile"
-      options = {{
-        title: 'Profile',
-        headerShown: false,
-        tabBarIcon: ({color, focused}) => (
-          <TabIcon
-            icon = {icons.profile}
-            color = {color}
-            name = "Profile"
-            focused = {focused}
-            />
-        )
-      }} />
+        <Tabs.Screen 
+          name="profile"
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs text-white mt-2`}>
+                Profile
+              </Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={icons.profile}
+                style={{ width: 24, height: 24, tintColor: color }}
+                resizeMode="contain"
+              />
+            ),
+          }}
+        />
       </Tabs>
     </>
-  )
-}
+  );
+};
 
-export default TabsLayout
+export default TabsLayout;
