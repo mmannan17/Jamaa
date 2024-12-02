@@ -35,6 +35,28 @@ const Provider = ( { children } ) => {
       }
     }, [user]);
 
+    const registerUser = async (userData) => {
+      try {
+        const response = await fetch(`${domain}MosqueApp/register/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Registration failed');
+        }
+    
+        return await response.json();
+      } catch (error) {
+        console.error('Error registering user:', error);
+        throw error;
+      }
+    };
+
     const login = async (username, password) => {
       try {
         const response = await fetch(`${domain}/MosqueApp/login/`, {
@@ -650,32 +672,33 @@ const Provider = ( { children } ) => {
 
 
     const globalContext = {
-        isLoggedIn,
-        setIsLoggedIn,
-        login,
-        logout,
-        getPosts,
-        user,
-        allPosts,
-        mosques,
-        getMosques,
-        getMosquePosts,
-        mosquePosts,
-        createPost,
-        checkExistingToken,
-        deletePost,
-        location,
-        getUserLocation, 
-        getNearbyMosques,
-        nearbyMosques,
-        editMosque,
-        followMosque,
-        unfollowMosque,
-        checkFollowingStatus,
-        fetchPrayerTimes,
-        updatePrayerTimes,
-        getFollowedMosques,
-        followedMosques,
+      registerUser,
+      isLoggedIn,
+      setIsLoggedIn,
+      login,
+      logout,
+      getPosts,
+      user,
+      allPosts,
+      mosques,
+      getMosques,
+      getMosquePosts,
+      mosquePosts,
+      createPost,
+      checkExistingToken,
+      deletePost,
+      location,
+      getUserLocation, 
+      getNearbyMosques,
+      nearbyMosques,
+      editMosque,
+      followMosque,
+      unfollowMosque,
+      checkFollowingStatus,
+      fetchPrayerTimes,
+      updatePrayerTimes,
+      getFollowedMosques,
+      followedMosques,
         uploadPrayerTimes,
         getNearbyEvents,
         nearbyEvents,

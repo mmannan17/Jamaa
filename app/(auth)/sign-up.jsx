@@ -7,7 +7,6 @@ import CustomButton from '../../components/CustomButton';
 import { Link, useNavigation } from 'expo-router';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { registerUser } from '../../apiRequests';
 import { Context } from '../../components/globalContext'
 
 
@@ -19,7 +18,7 @@ const SignUp = () => {
     latitude: null,
     longitude: null,
   });
-  const { getUserLocation } = useContext(Context);
+  const { getUserLocation, registerUser } = useContext(Context);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -28,7 +27,6 @@ const SignUp = () => {
   const submit = async () => {
     setIsSubmitting(true);
     try {
-      console.log(form.username)
       const location = await getUserLocation(form.username)
       if (!location) {
         console.log('Location Error', 'Could not fetch location or permission denied.');
@@ -40,11 +38,10 @@ const SignUp = () => {
         email: form.email,
         password: form.password,
         role: "user",
-        latitude: location.latitude || 0.0,  // Fallback in case location is not shared
+        latitude: location.latitude || 0.0,
         longitude: location.longitude || 0.0,
       };
-      const response = await registerUser(userData);
-      console.log('User registered successfully:', response);
+      await registerUser(userData);
       navigation.navigate('sign-in');
     } catch (error) {
       console.error('Error registering user:', error);
