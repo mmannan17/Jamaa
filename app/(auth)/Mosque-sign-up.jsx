@@ -1,21 +1,21 @@
 import { View, Text, ScrollView, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
 import { Link, useNavigation } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
-import { registerUser } from '../../apiRequests';
-
+import { Context } from '../../components/globalContext';
 const SignUp = () => {
+
   const [form, setForm] = useState({
     username: '',
     email: '',
     password: '',
     address: ''
   });
-
+  const [ registerUser ] = useContext(Context)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
