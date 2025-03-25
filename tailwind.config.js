@@ -4,6 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // beige color is #E8E7C2
         primary: "#161622",
         secondary: {
           DEFAULT: "#FF9C01",

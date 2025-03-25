@@ -1,31 +1,53 @@
 {
   "expo": {
-    "name": "The Masjid App",
-    "slug": "TheMasjidApp",
-    "scheme": "TheMasjidApp",
+    "name": "Jamaah",
+    "slug": "jamaah",
+    "scheme": "jamaah",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/mosque.jpg",
+      "image": "./assets/images/mosque.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.jamaa.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app requires location access to provide personalized mosque-related features near you."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
-      "favicon": "./assets/mosque.jpg"
+      "favicon": "./assets/images/mosque.jpg"
     },
     "plugins": [
-      "expo-router"
-    ]
+      "expo-router",
+      "expo-document-picker",
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3615a212-11fd-4bb8-adb9-a7fb159e5978"
+      }
+    },
+    "owner": "tameemtantawy"
   }
 }
