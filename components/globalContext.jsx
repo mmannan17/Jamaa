@@ -28,7 +28,7 @@ const Provider = ( { children } ) => {
 
 
     useEffect(() => {
-      console.log(user)
+      // console.log(user)
       if (user && user.username) {
         getUserLocation(user.username);
         getFollowedMosques();
@@ -106,7 +106,7 @@ const Provider = ( { children } ) => {
         }
     
         const events = await response.json();
-        console.log(events); // For debugging purposes
+        // console.log(events); // For debugging purposes
         setNearbyEvents(events); // Store events in the state
       } catch (error) {
         console.error('Error fetching nearby events:', error);
@@ -200,10 +200,10 @@ const Provider = ( { children } ) => {
           method: 'GET',
         });
     
-        console.log(response)
+        // console.log(response)
         if (response.ok) {
           const data = await response.json();
-          console.log(data)
+          // console.log(data)
           setFollowedMosques(data.mosque_ids);
         } else {
           throw new Error('Failed to fetch followed mosques');
@@ -277,12 +277,12 @@ const Provider = ( { children } ) => {
           `${domain}/MosqueApp/display/${mosqueId}/prayertimes/`,
           { method: 'GET' }
         );
-        console.log(response)
+        // console.log(response)
         if (response.ok) {
           return await response.json();
         } else {
           const errorData = await response.json();
-          console.error(errorData)
+          // console.error(errorData)
           return null;
         }
       } catch (error) {
@@ -291,7 +291,7 @@ const Provider = ( { children } ) => {
       }
     };
     const updatePrayerTimes = async (mosqueId, updatedTimes) => {
-      console.log(updatedTimes)
+      // console.log(updatedTimes)
       try {
         const response = await authenticatedFetch(`${domain}/MosqueApp/edit_prayer_time/${mosqueId}/`, {
           method: 'PUT',
@@ -300,11 +300,11 @@ const Provider = ( { children } ) => {
           },
           body: JSON.stringify(updatedTimes),
         });
-        console.log(response)
+        // console.log(response)
         
         if (response.ok) {
           const data = await response.json();
-          console.log("Updated Prayer Times:", data);
+          // console.log("Updated Prayer Times:", data);
           return data;
         } else {
           throw new Error("Failed to update prayer times");
@@ -435,7 +435,7 @@ const Provider = ( { children } ) => {
       // If no prior location sharing history, always request permissions
       if (locationShared === null || locationShared === 'false') {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        console.log(status)
+        // console.log(status)
   
         if (status === 'granted') {
           const location = await Location.getCurrentPositionAsync({});
@@ -577,9 +577,9 @@ const Provider = ( { children } ) => {
           throw new Error('Upload URL not found in the response');
         }
         uploadUrl = initialResult.url.split('?')[0];
-        console.log(uploadUrl)
+        // console.log(uploadUrl)
 
-        console.log("Made it through step 1")
+        // console.log("Made it through step 1")
 
         // Step 2: PUT request to upload the binary image
         let blob;

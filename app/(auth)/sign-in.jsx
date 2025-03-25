@@ -37,15 +37,15 @@ const [isSubmitting, setisSubmitting] = useState(false);
   return (
     <SafeAreaView className ="bg-primary h-full">
      <ScrollView>
-      <View className="w-full justify-center min-h-[15vh] px-4 my-6">
-        <View className="w-full flex items-end">
+      <View className="w-full justify-center min-h-[550] px-4 my-6 mt-10 ">
+        <View className="flex-row items-center mb-[-27] space-x-2">
+          <Text className="text-3xl text-white font-psemibold">Log in to Jamaa</Text>
           <Image source={images.testLogoSmall}
             resizeMode='contain' className="w-[115px] h-[80px]"/>
         </View>
-        <Text className="text-2xl text-white mt-100 font-psemibold">Log in to Jamaa</Text>
         
         {error && (
-          <Text className="text-red-500 mt-2 text-left text-base">{error}</Text>
+          <Text className="text-red-500 mt-6 text-left text-base">{error}</Text>
         )}
 
         <FormField 
@@ -71,7 +71,7 @@ const [isSubmitting, setisSubmitting] = useState(false);
         containerStyles="mt-7"
         isLoading = {isSubmitting}
         />
-        <View className="justify-center pt-5 flex-row gap-2">
+        <View className="justify-center pt-5 flex-row gap-2 ">
           <Text className ="text-lg text-gray-100 font-pregular">
             Don't have an account?
           </Text>
