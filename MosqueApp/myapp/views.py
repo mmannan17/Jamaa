@@ -33,6 +33,7 @@ import io
 from openpyxl import Workbook
 import pandas as pd
 from datetime import time
+from .utils import MosqueUtil
 
 from openai import OpenAI
 load_dotenv()
@@ -307,8 +308,8 @@ logger = logging.getLogger(__name__)
 
 
 
-AVERAGE_DRIVING_SPEED_MPH = 45  
-DRIVING_TIME_MINUTES = 30  
+AVERAGE_DRIVING_SPEED_MPH = 120 
+DRIVING_TIME_MINUTES = 60  
 DRIVING_DISTANCE_MILES = (AVERAGE_DRIVING_SPEED_MPH / 60) * DRIVING_TIME_MINUTES  
 KM_TO_MILES = 0.621371  
 
@@ -362,16 +363,55 @@ class NearbyMosquesView(APIView):
 
         return Response(mosques, status=status.HTTP_200_OK)
 
-
 class MosqueVerificationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logger.info(f"User {request.user} attempting to verify mosque")
-        # verification logic here 
-        # currently working on ways to verify mosques
-        return Response({'status': 'Mosque verification logic not implemented'}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
+        # Ensure the mosque ID is provided
+        mosque_id = request.data.get("mosque_id")
+        if not mosque_id:
+            return Response({"error": "Mosque ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ✅ FIXED: Correct lookup for mosque ID
+        mosque = get_object_or_404(Mosque, mosque_id=mosque_id)
+
+        # Fetch the PDF file path from the `nonprofitform` column
+        pdf_file = mosque.nonprofitform
+        if not pdf_file:
+            return Response({"error": "No nonprofit verification form found for this mosque"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # ✅ FIXED: Open the file correctly using Django Storage API
+            with pdf_file.open("rb") as file:
+                verification_result = MosqueUtil.verify_mosque(file)
+
+        except Exception as e:
+            logger.error(f"Error reading verification document: {str(e)}")
+            return Response({"error": "Failed to read verification document"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # ✅ FIXED: Check if `verification_result` is valid before accessing keys
+        if not isinstance(verification_result, dict) or "verification_result" not in verification_result:
+            logger.error("Invalid response format from MosqueUtil.verify_mosque")
+            return Response(
+                {"error": "Unexpected response format", "details": verification_result},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        verification_success = verification_result["verification_result"].get("valid", False)
+
+        # ✅ FIXED: Update verification status safely
+        if verification_success:
+            mosque.verified = True
+            mosque.save()
+            logger.info(f"Mosque {mosque.mosquename} successfully verified.")
+            verification_result["verification_status"] = "Mosque verification successful ✅"
+        else:
+            verification_result["verification_status"] = "Mosque verification failed ❌"
+
+        return Response(verification_result, status=status.HTTP_200_OK)
 
 class GetUsersView(ListAPIView):
     """
@@ -625,7 +665,7 @@ class EditPostView(APIView):
             return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # Check if the requesting user is the mosque user or has the appropriate role
-        if request.user != post.mosque.user and request.user.role != 'mosque':
+        if request.user != post.mosque.user or request.user.role != 'mosque':
             logger.error(f"User {request.user} does not have permission to edit post {post_id}")
             return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -723,11 +763,6 @@ class DeleteEventView(APIView):
     
 
 
-        
-
-
-
-
 logger = logging.getLogger(__name__)
 import datetime
 
@@ -782,7 +817,11 @@ class PrayerTimeUploadView(APIView):
 
         current_datetime = datetime.datetime.now()
 
+
         year = current_datetime.year
+        month = current_datetime.month
+        print("month:",month)
+        print("year:",year)
         # Convert time objects to strings
         data = self.convert_time_to_string(data)
         
@@ -793,7 +832,7 @@ class PrayerTimeUploadView(APIView):
             "Extract iqama times for each day from the following data and return them in a structured JSON format. "
             "Use the date as the key and include only the iqama times. Ensure the output is valid JSON:\n"
             "store the prayer times in the order of the prayers fajr should be first then zhuhr then asr then maghreb then isha. "
-            f"the date key should be in the format {year}-%m-%d and use the current year we're in for the year section. "
+            f"the date key should be in the format {year}-{month:02d}-%d and use the current year we're in and current month for the year and month section. "
             f"{json_data}"
         )
         response = client.chat.completions.create(
@@ -845,6 +884,7 @@ class DisplayPrayers(APIView):
     def get(self, request, mosque_id):
         # Get the current date formatted as yyyy-mm-dd
         formatted_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        print("formatted_date:",formatted_date)
 
         try:
             # Retrieve the mosque instance
@@ -906,3 +946,6 @@ class EditPrayerTime(APIView):
 
         logger.info(f"Prayer times for {date} updated for mosque {mosque_id}")
         return Response({'status': f'Prayer times for {date} updated successfully'}, status=status.HTTP_200_OK)
+
+
+

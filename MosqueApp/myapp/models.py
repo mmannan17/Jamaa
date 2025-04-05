@@ -44,6 +44,7 @@ class Mosque(models.Model):
     grid_cell_lat = models.IntegerField(default=0)
     grid_cell_lon = models.IntegerField(default=0)
     nonprofitform = models.FileField(upload_to='mosque_verification/', blank=True, null=True,default='placeholder.pdf')
+    verified = models.BooleanField(default=False)
 
     class Meta:
         permissions = [
