@@ -953,16 +953,6 @@ class EditPrayerTime(APIView):
 
     
 
-class AddProfilePicture(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, mosque_id):
-        mosque = Mosque.objects.get(mosque_id=mosque_id)
-        profile_pic = request.FILES.get('image')
-        mosque.profile_pic = profile_pic
-        mosque.save()
-        return Response({'status': f'Profile picture added successfully {mosque.profile_pic}'}, status=status.HTTP_200_OK)
-            
             
 
 class AddProfilePicture(APIView):
