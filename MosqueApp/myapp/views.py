@@ -766,6 +766,8 @@ class DeleteEventView(APIView):
 logger = logging.getLogger(__name__)
 import datetime
 
+
+# reworking this
 class PrayerTimeUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -949,3 +951,47 @@ class EditPrayerTime(APIView):
 
 
 
+    
+
+class AddProfilePicture(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, mosque_id):
+        mosque = Mosque.objects.get(mosque_id=mosque_id)
+        profile_pic = request.FILES.get('image')
+        mosque.profile_pic = profile_pic
+        mosque.save()
+        return Response({'status': f'Profile picture added successfully {mosque.profile_pic}'}, status=status.HTTP_200_OK)
+            
+            
+
+class AddProfilePicture(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logger.info(f"User {request.user} attempting to upload profile picture")
+        
+        if not request.user.has_perm('myapp.can_post_media'):
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        profile_pic = request.FILES.get('profile_pic')
+        mosque_id = request.data.get('mosque_id')
+
+        if not profile_pic or not mosque_id:
+            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            mosque = Mosque.objects.get(mosque_id=mosque_id)
+            mosque.profile_pic = profile_pic  
+            mosque.save()
+
+            return Response({
+                'status': 'Profile picture uploaded successfully',
+                'url': mosque.profile_pic.url  
+            }, status=status.HTTP_200_OK)
+
+        except Mosque.DoesNotExist:
+            return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Error uploading profile picture: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

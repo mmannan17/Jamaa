@@ -3,7 +3,7 @@ from .views import (
     RegisterUserView, UpdateMosqueView, FollowMosqueView,
     PostAnnouncementView, PostMediaView, PostEventView, LikePostView, NearbyMosquesView,MosqueVerificationView,GetUsersView, GetUserDetailView,
     GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView,DeletePostsView,SavePostView,GetMosqueDetailView,PrayerTimeUploadView,DeleteEventView,EditMosqueView,
-    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime
+    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime,AddProfilePicture
 )
 
 urlpatterns = [
@@ -33,6 +33,7 @@ urlpatterns = [
     path('user/<int:user_id>/following/',DisplayFollowing.as_view(), name='display_following'),
     path('display/<int:mosque_id>/prayertimes/',DisplayPrayers.as_view(), name='display_prayertimes'),
     path('edit_post/<int:post_id>/',EditPostView.as_view(), name='editpost'),
-    path('edit_prayer_time/<int:mosque_id>/',EditPrayerTime.as_view(), name='edit_prayer_time')
+    path('edit_prayer_time/<int:mosque_id>/',EditPrayerTime.as_view(), name='edit_prayer_time'),
+    path('upload_profile_pic/',AddProfilePicture.as_view(), name='upload_profile_pic')
 
 ]

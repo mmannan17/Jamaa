@@ -36,7 +36,7 @@ class Mosque(models.Model):
     email = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255,blank=False, null=False,default='')
     description = models.TextField(blank=True, null=True)
-    profile_pic = models.CharField(max_length=255, blank=True, null=True)
+    profile_pic = models.ImageField(upload_to='mosque_profile_pics/', null=True, blank=True)
     prayer_times = models.JSONField(default=dict, null=True, blank=True)
     address = models.CharField(max_length=255, unique=True)
     lat = models.FloatField(default=0.0)
