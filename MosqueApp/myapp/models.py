@@ -46,7 +46,7 @@ class Mosque(models.Model):
     email = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255,blank=False, null=False,default='')
     description = models.TextField(blank=True, null=True)
-    profile_pic = models.CharField(max_length=255, blank=True, null=True)
+    profile_pic = models.ImageField(upload_to='mosque_profile_pics/', null=True, blank=True)
     prayer_times = models.JSONField(default=dict, null=True, blank=True)
     address = models.CharField(max_length=255, unique=True)
     lat = models.FloatField(default=0.0)
@@ -54,6 +54,7 @@ class Mosque(models.Model):
     grid_cell_lat = models.IntegerField(default=0)
     grid_cell_lon = models.IntegerField(default=0)
     nonprofitform = models.FileField(upload_to='mosque_verification/', blank=True, null=True,default='placeholder.pdf')
+    verified = models.BooleanField(default=False)
 
     class Meta:
         permissions = [

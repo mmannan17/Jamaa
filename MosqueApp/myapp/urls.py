@@ -2,8 +2,8 @@ from django.urls import path
 from .views import (
     RegisterUserView, UpdateMosqueView, FollowMosqueView,
     PostAnnouncementView, PostMediaView, PostEventView, LikePostView, NearbyMosquesView,MosqueVerificationView,GetUsersView, GetUserDetailView,
-    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView,DeletePostsView,SavePostView,GetMosqueDetailView,DeleteEventView,EditMosqueView,
-    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime,OrganizationProfileView,TagOrganizationView,UserPrayerTimes
+    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView,DeletePostsView,SavePostView,GetMosqueDetailView,PrayerTimeUploadView,DeleteEventView,EditMosqueView,
+    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime,AddProfilePicture,OrganizationProfileView,TagOrganizationView,UserPrayerTimes
 )
 
 urlpatterns = [
@@ -33,6 +33,7 @@ urlpatterns = [
     path('display/<int:mosque_id>/prayertimes/',DisplayPrayers.as_view(), name='display_prayertimes'),
     path('edit_post/<int:post_id>/',EditPostView.as_view(), name='editpost'),
     path('edit_prayer_time/<int:mosque_id>/',EditPrayerTime.as_view(), name='edit_prayer_time'),
+    path('upload_profile_pic/',AddProfilePicture.as_view(), name='upload_profile_pic'),
     path('organization/profile/', OrganizationProfileView.as_view(), name='organization_profile'),
     path('organization/<int:organization_id>/tag/', TagOrganizationView.as_view(), name='tag_organization'),
     path('organization/tagged/', TagOrganizationView.as_view(), name='get_tagged_organizations'),
