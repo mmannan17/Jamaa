@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Mosque, Post, Follow, Events
+from .models import CustomUser, Mosque, Post, Follow, Events, Organization
 from .utils import get_grid
 from django import forms
 from .updatelocation import get_location
@@ -12,7 +12,7 @@ class EventSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['post_id', 'mosque','title', 'posttype', 'content', 'media_type', 'media_file', 'event_details', 'event_date', 'timestamp', 'likes'] 
+        fields = ['post_id', 'mosque', 'organization', 'title', 'posttype', 'content', 'media_type', 'media_file', 'event_details', 'event_date', 'timestamp', 'likes'] 
 
 class MosqueSerializer(serializers.ModelSerializer):
     posts = PostSerializer(many=True, read_only=True)
@@ -71,3 +71,20 @@ class PostEventForm(forms.ModelForm):
     class Meta:
         model = Events
         fields = ['mosque', 'event_title', 'event_date', 'location', 'event_description', 'rsvp']
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = [
+            'organization_id',
+            'organization_name',
+            'organization_bio',
+            'profile_pic',
+            'email',
+            'is_verified',
+            'address',
+            'latitude',
+            'longitude',
+            'grid_cell_lat',
+            'grid_cell_lon'
+        ]

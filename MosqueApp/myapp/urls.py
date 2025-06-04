@@ -2,8 +2,8 @@ from django.urls import path
 from .views import (
     RegisterUserView, UpdateMosqueView, FollowMosqueView,
     PostAnnouncementView, PostMediaView, PostEventView, LikePostView, NearbyMosquesView,MosqueVerificationView,GetUsersView, GetUserDetailView,
-    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView,DeletePostsView,SavePostView,GetMosqueDetailView,PrayerTimeUploadView,DeleteEventView,EditMosqueView,
-    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime
+    GetPostsView, GetPostDetailView,UserProfileView,UserLoginView,NearbyEventsView,DeletePostsView,SavePostView,GetMosqueDetailView,DeleteEventView,EditMosqueView,
+    DisplayFollowing,DisplayPrayers,EditPostView,EditPrayerTime,OrganizationProfileView,TagOrganizationView,UserPrayerTimes
 )
 
 urlpatterns = [
@@ -27,12 +27,14 @@ urlpatterns = [
     path('posts/<int:post_id>/delete/', DeletePostsView.as_view(), name='delete-post'),
     path('post/save/', SavePostView.as_view(), name='save_post'),
     path('getmosque/<str:lookup_value>/',GetMosqueDetailView.as_view(), name='get_mosque'),
-    path('upload_prayer_times/',PrayerTimeUploadView.as_view(), name='upload_prayer_times'),
     path('delete_event/<int:event_id>/',DeleteEventView.as_view(), name='delete_event'),
     path('edit_mosque/',EditMosqueView.as_view(), name='edit_mosque'),
     path('user/<int:user_id>/following/',DisplayFollowing.as_view(), name='display_following'),
     path('display/<int:mosque_id>/prayertimes/',DisplayPrayers.as_view(), name='display_prayertimes'),
     path('edit_post/<int:post_id>/',EditPostView.as_view(), name='editpost'),
-    path('edit_prayer_time/<int:mosque_id>/',EditPrayerTime.as_view(), name='edit_prayer_time')
-
+    path('edit_prayer_time/<int:mosque_id>/',EditPrayerTime.as_view(), name='edit_prayer_time'),
+    path('organization/profile/', OrganizationProfileView.as_view(), name='organization_profile'),
+    path('organization/<int:organization_id>/tag/', TagOrganizationView.as_view(), name='tag_organization'),
+    path('organization/tagged/', TagOrganizationView.as_view(), name='get_tagged_organizations'),
+    path('user/prayer_times/', UserPrayerTimes.as_view(), name='user_prayer_times'),
 ]

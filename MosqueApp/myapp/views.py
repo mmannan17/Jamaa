@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .models import CustomUser, Mosque, Post, Follow
-from .serializers import CustomUserSerializer, MosqueSerializer, PostEventForm, PostSerializer,FollowSerializer
+from .models import CustomUser, Mosque, Post, Follow, Organization
+from .serializers import CustomUserSerializer, MosqueSerializer, PostEventForm, PostSerializer,FollowSerializer, OrganizationSerializer
 from django.contrib.auth.models import Permission
 from .updatelocation import get_location
+from django.db import transaction
 from .utils import get_grid
 from django.core.cache import cache
 from .models import Events
@@ -25,19 +26,20 @@ import boto3
 import json
 import os
 from dotenv import load_dotenv
-import openai
+# import openai
 import pytesseract
 from PIL import Image
 import base64
 import io
 from openpyxl import Workbook
 import pandas as pd
-from datetime import time
+from datetime import datetime  
+import requests
 
-from openai import OpenAI
+# from openai import OpenAI
 load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-client = OpenAI(api_key=OPENAI_API_KEY)
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# client = OpenAI(api_key=OPENAI_API_KEY)
 pytesseract_path = os.getenv('PYTESSERACT_PATH')
 pytesseract.pytesseract.tesseract_cmd = pytesseract_path
 
@@ -47,97 +49,103 @@ def index(request):
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
+
+
+SHARED_PERMISSION_CODES = [
+    'can_post_announcements',
+    'can_put_up_events',
+    'can_post_media'
+]
+
 class RegisterUserView(APIView):
     def post(self, request):
         logger.info("Starting user registration")
-        start_time = time.time()
 
         serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            validated_data = serializer.validated_data
-            role = validated_data['role']
-            logger.info(f"Validation successful for role: {role}")
+        if not serializer.is_valid():
+            logger.error(f"Validation failed: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            if role == 'mosque':
-                address = request.data.get('address')
-                lat, lon = get_location(address)
-                logger.info(f"Retrieved location for address {address}: lat={lat}, lon={lon}")
+        validated_data = serializer.validated_data
+        role = validated_data['role']
+        username = validated_data['username']
+        email = validated_data['email']
+        password = validated_data['password']
 
-                if lat is None or lon is None:
-                    return Response({'error': 'Invalid address'}, status=status.HTTP_400_BAD_REQUEST)
-                
-                grid_lat, grid_lon = get_grid(lat, lon)
+        try:
+            with transaction.atomic():
+                logger.info(f"Registering role: {role}")
 
-                user_start_time = time.time()
+                # Get permissions
+                shared_perms = Permission.objects.filter(codename__in=SHARED_PERMISSION_CODES)
+                if shared_perms.count() != len(SHARED_PERMISSION_CODES):
+                    logger.error("Missing or duplicate shared permissions")
+                    return Response({"error": "One or more permissions are missing or duplicated."},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                if role == 'mosque' or role == 'organization':
+                    address = request.data.get('address')
+                    lat, lon = get_location(address)
+                    if lat is None or lon is None:
+                        return Response({'error': 'Invalid address'}, status=status.HTTP_400_BAD_REQUEST)
+                    grid_lat, grid_lon = get_grid(lat, lon)
+
                 user = CustomUser.objects.create(
-                    username=validated_data['username'],
-                    email=validated_data['email'],
+                    username=username,
+                    email=email,
                     role=role,
-                    latitude=lat,
-                    longitude=lon,
+                    latitude=lat if role != 'user' else request.data.get('latitude'),
+                    longitude=lon if role != 'user' else request.data.get('longitude'),
+                    grid_cell_lat=grid_lat if role != 'user' else get_grid(float(request.data.get('latitude')), float(request.data.get('longitude')))[0],
+                    grid_cell_lon=grid_lon if role != 'user' else get_grid(float(request.data.get('latitude')), float(request.data.get('longitude')))[1],
                 )
-                user.set_password(validated_data['password'])
+                user.set_password(password)
                 user.save()
-                user_creation_time = time.time() - user_start_time
-                logger.info(f"Created user: {user} in {user_creation_time:.2f} seconds")
 
-                permissions = [
-                    Permission.objects.get(codename='can_change_prayer_times'),
-                    Permission.objects.get(codename='can_post_announcements'),
-                    Permission.objects.get(codename='can_put_up_events'),
-                    Permission.objects.get(codename='can_post_media'),
-                ]
-                user.user_permissions.set(permissions)
-                logger.info(f"Assigned permissions to user: {permissions}")
+                # Assign shared permissions
+                user.user_permissions.set(shared_perms)
 
-                mosque_start_time = time.time()
-                mosque = Mosque.objects.create(
-                    user=user,
-                    email=user.email,
-                    mosquename=user.username,
-                    address=address,
-                    lat=lat,
-                    lon=lon,
-                    grid_cell_lat=grid_lat,
-                    grid_cell_lon=grid_lon,
-                )
-                mosque_creation_time = time.time() - mosque_start_time
-                logger.info(f"Created mosque: {mosque} in {mosque_creation_time:.2f} seconds")
+                # Exclusive permission for mosque
+                if role == 'mosque':
+                    extra_perm = Permission.objects.get(codename='can_change_prayer_times')
+                    user.user_permissions.add(extra_perm)
 
-            elif role == 'user':
-                latitude = request.data.get('latitude')
-                longitude = request.data.get('longitude')
+                    Mosque.objects.create(
+                        user=user,
+                        email=email,
+                        mosquename=username,
+                        address=address,
+                        lat=lat,
+                        lon=lon,
+                        grid_cell_lat=grid_lat,
+                        grid_cell_lon=grid_lon,
+                    )
 
-                grid_lat, grid_lon = get_grid(latitude, longitude)
+                elif role == 'organization':
+                    Organization.objects.create(
+                        user=user,
+                        organization_name=username,
+                        email=email,
+                        address=address,
+                        latitude=lat,
+                        longitude=lon,
+                        grid_cell_lat=grid_lat,
+                        grid_cell_lon=grid_lon,
+                    )
 
-                user_start_time = time.time()
-                user = CustomUser.objects.create(
-                    username=validated_data['username'],
-                    email=validated_data['email'],
-                    role=role,
-                    latitude=latitude,
-                    longitude=longitude,
-                    grid_cell_lat=grid_lat,
-                    grid_cell_lon=grid_lon,
-                )
-                user.set_password(validated_data['password'])
-                user.save()
-                user_creation_time = time.time() - user_start_time
-                logger.info(f"Created user: {user} in {user_creation_time:.2f} seconds")
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': serializer.data
+                }, status=status.HTTP_201_CREATED)
 
-            refresh = RefreshToken.for_user(user)
-
-            total_time = time.time() - start_time
-            logger.info(f"Total registration time: {total_time:.2f} seconds")
-
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'user': serializer.data
-            }, status=status.HTTP_201_CREATED)
-        
-        logger.error(f"User registration failed: {serializer.errors}")
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Permission.DoesNotExist as e:
+            logger.error(f"Missing permission: {str(e)}")
+            return Response({'error': 'A required permission is missing.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.exception("Unexpected error during registration")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -514,30 +522,33 @@ class NearbyEventsView(APIView):
         lat = float(request.query_params.get('lat'))
         lon = float(request.query_params.get('lon'))
 
-        logger.info(f"User {request.user} requesting nearby events for lat: {lat}, lon: {lon}")
-
-        # Call the existing nearby mosques view to get nearby mosques
+        # Get nearby mosques and organizations
         nearby_mosques_view = NearbyMosquesView()
         mosques_response = nearby_mosques_view.get(request).data
-
-        # Extract mosque IDs from the response
         mosque_ids = [mosque['mosque_id'] for mosque in mosques_response]
 
-        # Fetch events for the nearby mosques
-        events = Events.objects.filter(mosque_id__in=mosque_ids).order_by('event_date')
+        # Fetch events from both mosques and organizations
+        events = Events.objects.filter(
+            Q(mosque_id__in=mosque_ids) | Q(organization__isnull=False)
+        ).order_by('event_date')
 
         events_list = []
         for event in events:
-            events_list.append({
-                'mosque_id': event.mosque_id,
+            event_data = {
                 'event_title': event.event_title,
                 'event_date': event.event_date,
                 'location': event.location,
                 'event_description': event.event_description,
                 'rsvp': event.rsvp
-            })
-
-        logger.info(f"Nearby events fetched successfully")
+            }
+            if event.mosque:
+                event_data['mosque_id'] = event.mosque.mosque_id
+                event_data['type'] = 'mosque'
+            else:
+                event_data['organization_id'] = event.organization.organization_id
+                event_data['type'] = 'organization'
+            
+            events_list.append(event_data)
 
         return Response(events_list, status=status.HTTP_200_OK)
     
@@ -547,27 +558,20 @@ class DeletePostsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, post_id):
-        logger.info(f"User {request.user} attempting to delete post id: {post_id}")
-        
         try:
             post = Post.objects.get(post_id=post_id)
         except Post.DoesNotExist:
-            logger.error(f"Post with id {post_id} not found")
             return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # The mosque associated with the post
-        mosque = post.mosque
-
-        # The user associated with the mosque
-        mosque_user = mosque.user
-
-        # Check if the requesting user is the mosque user or has the appropriate role
-        if request.user != mosque_user and request.user.role != 'mosque':
-            logger.error(f"User {request.user} does not have permission to delete post {post_id}")
-            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        # Check ownership based on post type
+        if post.mosque:
+            if request.user != post.mosque.user:
+                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        elif post.organization:
+            if request.user != post.organization.user:
+                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
         post.delete()
-        logger.info(f"Post {post_id} deleted by user {request.user}")
         return Response({'status': 'Post deleted successfully'}, status=status.HTTP_200_OK)
     
 
@@ -576,34 +580,41 @@ class SavePostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user  # logged-in user who created the post
+        user = request.user
         data = request.data
 
-        # Get the mosque by mosque_id or name
-        mosque_id = data.get('mosque_id')
-        mosque_name = data.get('mosque_name')
+        # Determine if this is a mosque or organization post
+        if user.role == 'mosque':
+            try:
+                mosque = user.mosque
+                post_data = {
+                    'mosque': mosque.mosque_id,
+                    'organization': None,
+                    'title': data.get('title', ''),
+                    'posttype': data.get('posttype', ''),
+                    'content': data.get('content', ''),
+                    'media_file': data.get('media_url', ''),
+                    'media_type': data.get('media_type', ''),
+                }
+            except Mosque.DoesNotExist:
+                return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
+        elif user.role == 'organization':
+            try:
+                organization = user.organization
+                post_data = {
+                    'mosque': None,
+                    'organization': organization.organization_id,
+                    'title': data.get('title', ''),
+                    'posttype': data.get('posttype', ''),
+                    'content': data.get('content', ''),
+                    'media_file': data.get('media_url', ''),
+                    'media_type': data.get('media_type', ''),
+                }
+            except Organization.DoesNotExist:
+                return Response({'error': 'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Invalid user role'}, status=status.HTTP_403_FORBIDDEN)
 
-        try:
-            if mosque_id:
-                mosque = Mosque.objects.get(mosque_id=mosque_id)  
-            elif mosque_name:
-                mosque = Mosque.objects.get(mosquename=mosque_name)
-            else:
-                return Response({'error': 'Mosque ID or name is required'}, status=status.HTTP_400_BAD_REQUEST)
-        except Mosque.DoesNotExist:
-            return Response({'error': 'Mosque not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        
-        post_data = {
-            'title': data.get('title',''),
-            'posttype': data.get('posttype', ''),
-            'content': data.get('content', ''),
-            'media_file': data.get('media_url', ''),
-            'media_type': data.get('media_type', ''),
-            'mosque': mosque.mosque_id,  
-        }
-
-        
         serializer = PostSerializer(data=post_data)
         if serializer.is_valid():
             serializer.save()
@@ -729,96 +740,6 @@ class DeleteEventView(APIView):
 
 
 logger = logging.getLogger(__name__)
-import datetime
-
-class PrayerTimeUploadView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        logger.info(f"User {request.user} attempting to upload prayer times")
-        
-        
-
-        excel_file = request.FILES.get('file')
-        if not excel_file:
-            return Response({'error': 'No Excel file uploaded'}, status=400)
-
-        # Step 1: Extract data from the Excel file
-        try:
-            json_data = self.extract_data_from_excel(excel_file)
-            logger.info(f"Extracted Data:\n{json_data}")
-        except Exception as e:
-            logger.error(f"Failed to extract data from Excel: {e}")
-            return Response({'error': 'Failed to extract data from Excel'}, status=500)
-
-        # Step 2: Send data to OpenAI and get the structured result
-        try:
-            structured_result = self.send_to_openai(json_data)
-            logger.info(f"Structured JSON from OpenAI:\n{structured_result}")
-        except Exception as e:
-            logger.error(f"Failed to process data with OpenAI: {e}")
-            return Response({'error': 'Failed to process data with OpenAI'}, status=500)
-
-        # Save the prayer times to the mosque's prayer_times field
-        try:
-            prayer_times_dict = structured_result
-            mosque = request.user.mosque
-            mosque.prayer_times = prayer_times_dict
-            mosque.save()
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to decode JSON response: {e}")
-            return Response({'error': 'Invalid JSON format from AI'}, status=500)
-
-        logger.info(f"Prayer times uploaded successfully for mosque {mosque}")
-        return Response({'status': 'Prayer times uploaded successfully'}, status=200)
-
-    def extract_data_from_excel(self, excel_file):
-        df = pd.read_excel(excel_file)
-        # Convert the DataFrame to a list of dictionaries
-        return df.to_dict(orient='records')
-
-    def send_to_openai(self, data):
-
-
-        current_datetime = datetime.datetime.now()
-
-        year = current_datetime.year
-        # Convert time objects to strings
-        data = self.convert_time_to_string(data)
-        
-        # Convert the dictionary to a JSON string
-        json_data = json.dumps(data)
-        
-        prompt = (
-            "Extract iqama times for each day from the following data and return them in a structured JSON format. "
-            "Use the date as the key and include only the iqama times. Ensure the output is valid JSON:\n"
-            "store the prayer times in the order of the prayers fajr should be first then zhuhr then asr then maghreb then isha. "
-            f"the date key should be in the format {year}-%m-%d and use the current year we're in for the year section. "
-            f"{json_data}"
-        )
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        content = response.choices[0].message.content.strip()
-
-        try:
-            start_index = content.find('{')
-            end_index = content.rfind('}') + 1
-            json_str = content[start_index:end_index]
-            return json.loads(json_str)
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to decode JSON response: {e}")
-            raise ValueError("Invalid JSON format from AI")
-
-    def convert_time_to_string(self, data):
-        for entry in data:
-            for key, value in entry.items():
-                if isinstance(value, datetime.time):
-                    entry[key] = value.strftime("%H:%M")
-        return data
-
-
 
 class DisplayFollowing(APIView):
     def get(self, request, user_id):
@@ -906,3 +827,225 @@ class EditPrayerTime(APIView):
 
         logger.info(f"Prayer times for {date} updated for mosque {mosque_id}")
         return Response({'status': f'Prayer times for {date} updated successfully'}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+class OrganizationProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        organization_id = request.query_params.get('organization_id')
+        organization_name = request.query_params.get('organization_name')
+        
+        try:
+            if organization_id:
+                organization = get_object_or_404(Organization, organization_id=organization_id)
+            elif organization_name:
+                organization = get_object_or_404(Organization, organization_name=organization_name)
+            else:
+                user = request.user
+                if user.role != 'organization':
+                    return Response({'error': 'Profile not available'}, status=status.HTTP_403_FORBIDDEN)
+                organization = user.organization
+        except Organization.DoesNotExist:
+            return Response({'error': 'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = OrganizationSerializer(organization)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        if request.user.role != 'organization':
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            organization = request.user.organization
+        except Organization.DoesNotExist:
+            return Response({'error': 'Organization not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrganizationSerializer(organization, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+class TagOrganizationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, organization_id):
+        """
+        Tag an organization with the requesting mosque
+        """
+        logger.info(f"Mosque {request.user} attempting to tag organization {organization_id}")
+        
+        # Check if the user is a mosque
+        if request.user.role != 'mosque':
+            logger.error(f"User {request.user} is not a mosque")
+            return Response({'error': 'Only mosques can tag organizations'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Get the organization
+            organization = Organization.objects.get(organization_id=organization_id)
+            
+            # Get the mosque
+            mosque = request.user.mosque
+            
+            # Add the tag
+            organization.tagged_by.add(mosque)
+            
+            logger.info(f"Organization {organization_id} tagged by mosque {mosque.mosque_id}")
+            return Response({
+                'status': 'Organization tagged successfully',
+                'organization_id': organization_id,
+                'mosque_id': mosque.mosque_id
+            }, status=status.HTTP_200_OK)
+            
+        except Organization.DoesNotExist:
+            logger.error(f"Organization {organization_id} not found")
+            return Response({'error': 'Organization not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+        except Mosque.DoesNotExist:
+            logger.error(f"Mosque not found for user {request.user}")
+            return Response({'error': 'Mosque not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, organization_id):
+        """
+        Remove a tag from an organization
+        """
+        logger.info(f"Mosque {request.user} attempting to untag organization {organization_id}")
+        
+        # Check if the user is a mosque
+        if request.user.role != 'mosque':
+            logger.error(f"User {request.user} is not a mosque")
+            return Response({'error': 'Only mosques can untag organizations'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Get the organization
+            organization = Organization.objects.get(organization_id=organization_id)
+            
+            # Get the mosque
+            mosque = request.user.mosque
+            
+            # Remove the tag
+            organization.tagged_by.remove(mosque)
+            
+            logger.info(f"Organization {organization_id} untagged by mosque {mosque.mosque_id}")
+            return Response({
+                'status': 'Organization untagged successfully',
+                'organization_id': organization_id,
+                'mosque_id': mosque.mosque_id
+            }, status=status.HTTP_200_OK)
+            
+        except Organization.DoesNotExist:
+            logger.error(f"Organization {organization_id} not found")
+            return Response({'error': 'Organization not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+        except Mosque.DoesNotExist:
+            logger.error(f"Mosque not found for user {request.user}")
+            return Response({'error': 'Mosque not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, organization_id=None):
+        """
+        Get all organizations tagged by a mosque or all mosques that tagged an organization
+        """
+        if organization_id:
+            # Get all mosques that tagged a specific organization
+            try:
+                organization = Organization.objects.get(organization_id=organization_id)
+                tagged_by = organization.tagged_by.all()
+                return Response({
+                    'organization_id': organization_id,
+                    'tagged_by': [{
+                        'mosque_id': mosque.mosque_id,
+                        'mosque_name': mosque.mosquename
+                    } for mosque in tagged_by]
+                }, status=status.HTTP_200_OK)
+            except Organization.DoesNotExist:
+                return Response({'error': 'Organization not found'}, 
+                              status=status.HTTP_404_NOT_FOUND)
+        else:
+            # Get all organizations tagged by the requesting mosque
+            if request.user.role != 'mosque':
+                return Response({'error': 'Only mosques can view their tagged organizations'}, 
+                              status=status.HTTP_403_FORBIDDEN)
+            
+            try:
+                mosque = request.user.mosque
+                tagged_organizations = mosque.tagged_organizations.all()
+                return Response({
+                    'mosque_id': mosque.mosque_id,
+                    'tagged_organizations': [{
+                        'organization_id': org.organization_id,
+                        'organization_name': org.organization_name
+                    } for org in tagged_organizations]
+                }, status=status.HTTP_200_OK)
+            except Mosque.DoesNotExist:
+                return Response({'error': 'Mosque not found'}, 
+                              status=status.HTTP_404_NOT_FOUND)
+
+
+class UserPrayerTimes(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    date = datetime.now().strftime("%d-%m-%Y")
+    
+    def get(self, request):
+        user = request.user
+        if user.role == 'user':
+            if not user.latitude or not user.longitude:
+                return Response({'error': 'User location not set'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                # Format the URL with the correct date format  ## fix this 
+                url = f'https://api.aladhan.com/v1/timingsByCity/{self.date}?city=Tampa&country=US&method=2'
+                logger.info(f"Calling API URL: {url}")
+                
+                response = requests.get(url)
+                
+                if response.status_code != 200:
+                    logger.error(f"API Error: {response.text}")
+                    return Response({'error': 'Failed to fetch prayer times'}, 
+                                  status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                data = response.json()
+                
+                if 'data' not in data or 'timings' not in data['data']:
+                    logger.error(f"Invalid response structure: {data}")
+                    return Response({'error': 'Invalid response from prayer times API'}, 
+                                  status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                prayer_times = data['data']['timings']
+                
+                # Convert each prayer time to 12-hour format using datetime
+                converted_times = {}
+                for prayer, time_str in prayer_times.items():
+                    try:
+                        time_obj = datetime.strptime(time_str, "%H:%M")
+                        converted_times[prayer] = time_obj.strftime("%I:%M %p")
+                    except ValueError:
+                        converted_times[prayer] = time_str
+                
+                return Response({'prayer_times': converted_times}, status=status.HTTP_200_OK)
+                
+            except requests.RequestException as e:
+                logger.error(f"Error fetching prayer times: {str(e)}")
+                return Response({'error': 'Failed to fetch prayer times'}, 
+                              status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except Exception as e:
+                logger.error(f"Unexpected error: {str(e)}")
+                return Response({'error': str(e)}, 
+                              status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+        return Response({'error': 'Invalid user role'}, status=status.HTTP_403_FORBIDDEN)
+            
